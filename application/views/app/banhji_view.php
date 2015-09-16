@@ -97,7 +97,7 @@
 			<li></li>
 		</ul>
 	</span>
-1</script>
+</script>
 <script type="text/x-kendo-template" id="login-tmpl">
 	<div class="container-960">
 		<div class="row">
