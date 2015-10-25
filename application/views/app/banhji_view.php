@@ -894,6 +894,17 @@
 		                    data-bind="value: fieldSearch,
 		                              source: fieldList"
 		                    style="width: 200px;" />
+		            ​
+		            | ប្រភេទអតិថិជន
+		            <input data-role="dropdownlist"
+		            		data-value-primitive="true"
+		            		data-auto-bind="true"				                    
+		                    data-text-field="name"
+		                    data-value-field="id"
+		                    data-bind="value: contactTypeID,
+		                              source: contactTypeDS"
+		                    data-option-label="(--- ជ្រើសរើស ---)"
+		                    style="width: 200px;" />
 		                   
 		            <button class="btn" type="button" data-bind="click: search"><i class="icon-search"></i></button>
 		            |
@@ -2632,7 +2643,8 @@
 		contactTypeDS: dataStore(baseUrl + "contacts/type"),
 		currencyDS 	: dataStore(baseUrl + "currencies"),
 
-		contact 	: null,			
+		contact 	: null,
+		contactTypeID : 0,			
 		genders		: ["M", "F"],
 		statusList 	: [            
 			{ "id": 1, "name": "កំពុងប្រើប្រាស់" },
@@ -2705,6 +2717,7 @@
 
 					self.dataSource.data([]);					
 					self.addEmpty();
+					banhji.contact_center.dataSource.fetch();
 				}				
 			});
 		}
@@ -3949,7 +3962,8 @@
 			if(banhji.pageLoaded["contact_center"]==undefined){
 				banhji.pageLoaded["contact_center"] = true;
 
-				
+				banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
+
 			}	
 		}
 	});
@@ -4162,14 +4176,15 @@
 		if(!auth.getLogin()){
 			banhji.router.navigate('/login');
 		}else{
-			var vm = banhji.saleCenter;
-			banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
+			var vm = banhji.saleCenter;			
 			banhji.view.layout.showIn("#content", banhji.view.saleCenter);
 
 			vm.pageLoad();
 
 			if(banhji.pageLoaded["sale_center"]==undefined){
 				banhji.pageLoaded["sale_center"] = true;
+
+				banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
 
 				$('.nav li a').click(function(e) {
 			        //e.preventDefault();

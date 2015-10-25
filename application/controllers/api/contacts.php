@@ -441,9 +441,10 @@ class Contacts extends REST_Controller {
 		if($obj->result_count()>0){
 			foreach ($obj as $value) {				
 		 		$data["results"][] = array(
-		 			"id" 		=> $value->id,											
-					"sub_of" 	=> $value->sub_of,	
-					"name" 		=> $value->name
+		 			"id" 		=> $value->id,
+		 			"name" 		=> $value->name,											
+					"description" 	=> $value->description
+					
 		 		);
 			}
 		}
