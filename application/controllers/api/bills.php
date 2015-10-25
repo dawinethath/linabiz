@@ -667,28 +667,36 @@ class bills extends REST_Controller {
 		$limit 		= $this->get('limit') !== false ? $this->get('limit') : 100;								
 		$sort 	 	= $this->get("sort");		
 		$data["results"] = array();
-		$data["count"] = 0;
+		$data["count"] = 0;		
 
 		$sale = new Bill(null, $this->entity);
+		$unpaid = new Bill(null, $this->entity);
+		$paid = 0;
+		$invest = new Bill(null, $this->entity);
 		$income = new Bill(null, $this->entity);
+		$total_income = 0;
+		
 		$bill = new Bill(null, $this->entity);
 		$unbill = new Bill(null, $this->entity);
+		$billed = 0;
 		$salary = new Bill(null, $this->entity);
 		$witdraw = new Bill(null, $this->entity);
 		$expense = new Bill(null, $this->entity);
-		$invest = new Bill(null, $this->entity);
+		$total_expense = 0;
 
 		//Filter		
 		if(!empty($filters) && isset($filters)){			
 	    	foreach ($filters as $value) {	    				
 	    		$sale->where($value["field"], $value["value"]);
+	    		$unpaid->where($value["field"], $value["value"]);
+	    		$invest->where($value["field"], $value["value"]);
 	    		$income->where($value["field"], $value["value"]);
+
 	    		$bill->where($value["field"], $value["value"]);
 	    		$unbill->where($value["field"], $value["value"]);
 	    		$salary->where($value["field"], $value["value"]);
 	    		$witdraw->where($value["field"], $value["value"]);
-	    		$expense->where($value["field"], $value["value"]);
-	    		$invest->where($value["field"], $value["value"]);	    		
+	    		$expense->where($value["field"], $value["value"]);	    			    		
 			}									 			
 		}
 		
@@ -696,60 +704,87 @@ class bills extends REST_Controller {
 		$sale->select_sum('amount');		
 		$sale->where_in("type", ["invoice","receipt"]);		
 		$sale->where("deleted", 0);
-		$sale->get();
-		$data["results"][] = array("sale"=>$sale->amount);
+		$sale->get();		
+				
+		//Unpaid
+		$unpaid->select_sum('amount');		
+		$unpaid->where("type", "invoice");
+		$unpaid->where("status", 0);
+		$unpaid->where("deleted", 0);
+		$unpaid->get();		
 		
-		//Income
-		$income->select_sum('amount');		
-		$income->where("type", "invoice");
-		$income->where("status", 0);
-		$income->where("deleted", 0);
-		$income->get();		
-		$data["results"][] = array("income"=>$income->amount);		
-
-		//Bill		
-		$bill->select_sum('amount');		
-		$bill->where("type", "bill");		
-		$bill->where("deleted", 0);
-		$bill->get();		
-		$data["results"][] = array("bill"=>$bill->amount);
-
-		//Unbill
-		$unbill->select_sum('amount');		
-		$unbill->where("type", "bill");
-		$unbill->where("status", 0);
-		$unbill->where("deleted", 0);
-		$unbill->get();		
-		$data["results"][] = array("unbill"=>$unbill->amount);
-
-		//Salary		
-		$salary->select_sum('amount');		
-		$salary->where("type", "salary");		
-		$salary->where("deleted", 0);
-		$salary->get();		
-		$data["results"][] = array("salary"=>$salary->amount);
-
-		//Witdraw		
-		$witdraw->select_sum('amount');		
-		$witdraw->where("type", "witdraw");		
-		$witdraw->where("deleted", 0);
-		$witdraw->get();		
-		$data["results"][] = array("witdraw"=>$witdraw->amount);
-
-		//Expense		
-		$expense->select_sum('amount');		
-		$expense->where("type", "expense");		
-		$expense->where("deleted", 0);
-		$expense->get();		
-		$data["results"][] = array("expense"=>$expense->amount);
-
+		$paid = $sale->amount - $unpaid->amount;
+		
 		//Invest		
 		$invest->select_sum('amount');		
 		$invest->where("type", "invest");
 		$invest->where("status", 0);
 		$invest->where("deleted", 0);
 		$invest->get();		
-		$data["results"][] = array("invest"=>$invest->amount);
+		
+		//Income
+		$income->select_sum('amount');		
+		$income->where("type", "income");		
+		$income->where("deleted", 0);
+		$income->get();
+		
+		$total_income = $paid + $invest->amount + $income->amount;
+				
+		//Bill		
+		$bill->select_sum('amount');		
+		$bill->where("type", "bill");		
+		$bill->where("deleted", 0);
+		$bill->get();		
+		
+		//Unbill
+		$unbill->select_sum('amount');		
+		$unbill->where("type", "bill");
+		$unbill->where("status", 0);
+		$unbill->where("deleted", 0);
+		$unbill->get();		
+		
+		$billed = $bill->amount - $unbill->amount;
+		
+		//Salary		
+		$salary->select_sum('amount');		
+		$salary->where("type", "salary");		
+		$salary->where("deleted", 0);
+		$salary->get();		
+		
+		//Witdraw		
+		$witdraw->select_sum('amount');		
+		$witdraw->where("type", "witdraw");		
+		$witdraw->where("deleted", 0);
+		$witdraw->get();		
+
+		//Expense		
+		$expense->select_sum('amount');		
+		$expense->where("type", "expense");		
+		$expense->where("deleted", 0);
+		$expense->get();					
+
+		$total_expense = $billed + $invest->salary + $witdraw->amount + $witdraw->expense;
+		
+		$total = $total_income - $total_expense;		
+
+		$data["results"][] = array(
+			"sale"			=> floatval($sale->amount),
+			"unpaid"		=> floatval($sale->unpaid),
+			"paid"			=> floatval($paid),
+			"invest"		=> floatval($invest->amount),
+			"income"		=> floatval($income->amount),
+			"total_income"	=> floatval($total_income),
+
+			"bill"			=> floatval($bill->amount),
+			"unbill"		=> floatval($unbill->amount),
+			"billed"		=> floatval($billed),
+			"salary"		=> floatval($salary->amount),
+			"witdraw"		=> floatval($witdraw->amount),
+			"expense"		=> floatval($expense->amount),
+			"total_expense"	=> floatval($total_expense),
+
+			"total"			=> floatval($total)
+		);		
 
 		$this->response($data, 200);		
 	}	

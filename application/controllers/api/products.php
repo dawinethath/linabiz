@@ -14,7 +14,7 @@ class Products extends REST_Controller {
 	function index_get() {		
 		$filters 	= $this->get("filter")["filters"];		
 		$page 		= $this->get('page') !== false ? $this->get('page') : 1;		
-		$limit 		= $this->get('limit') !== false ? $this->get('limit') : 100;								
+		$limit 		= $this->get('limit') !== false ? $this->get('limit') : 50;								
 		$sort 	 	= $this->get("sort");		
 		$data["results"] = array();
 		$data["count"] = 0;
@@ -134,11 +134,22 @@ class Products extends REST_Controller {
 	function index_post() {
 		$models = json_decode($this->post('models'));
 
+		$sku = "";
 		foreach ($models as $value) {
+			if($sku==""){				
+				$sku = $this->_generate_number();
+			}else{
+				$last_no = $sku;
+				$header = substr($last_no, 0, -4);
+				$no = intval(substr($last_no, strlen($last_no) - 5));
+				$no++;
+				$sku = $header . str_pad($no, 5, "0", STR_PAD_LEFT);
+			}
+
 			$obj = new Product(null, $this->entity);			
 			$obj->category_id 	= $value->category_id;			
 			$obj->unit_id 		= $value->unit_id;
-			$obj->sku 			= $value->sku;
+			$obj->sku 			= $sku;
 			$obj->name 			= $value->name;
 			$obj->description 	= $value->description;			
 			$obj->on_hand 		= $value->on_hand;			
@@ -237,6 +248,41 @@ class Products extends REST_Controller {
 
 		//Response data
 		$this->response($data, 200);
+	}
+
+	//GENERATE SKU
+	private function _generate_number(){		
+		$header = "IT";   	
+		
+		$YY = date("y");
+		$MM = date("m");
+		$headerWithDate = $header . $YY . $MM;
+
+		$inv = new Product(null, $this->entity);		
+		$inv->order_by('id', 'desc');
+		$inv->get();
+
+		$last_no = "";		
+		if($inv->result_count()>0){
+			$last_no = $inv->sku;
+		}
+		$no = 0;
+		$curr_YY = 0;
+		if(strlen($last_no)>10){
+			$no = intval(substr($last_no, strlen($last_no) - 5));
+			$curr_YY = intval(substr($last_no, strlen($last_no) - 9, 2));			
+		}				 
+		
+		//Reset invoice number back to 1 for the new year starts
+		if(intval($YY)>$curr_YY){
+			$no = 1;
+		}else{
+			$no++;
+		}
+								
+		$number = $headerWithDate . str_pad($no, 5, "0", STR_PAD_LEFT);					
+		
+		return $number;				
 	}    
 	
 }

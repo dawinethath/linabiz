@@ -78,6 +78,7 @@ class Contacts extends REST_Controller {
 			foreach ($obj as $value) {
 				$bal = new Bill(null, $this->entity);
 				$bal->select_sum("amount");
+				$bal->where("contact_id", $value->id);
 				$bal->where("status", 0);
 
 				if($value->contact_type_id==5){
