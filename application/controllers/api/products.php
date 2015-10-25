@@ -60,7 +60,7 @@ class Products extends REST_Controller {
 		    			$obj->where_related("contact", "id", $value["value"]);
 		    		}else if($value["operator"]=="search"){
 		    			$obj->like("sku", $value["value"], "after");
-				    	$obj->or_like("name", $value["value"], "after");
+				    	$obj->or_like("name", $value["value"], "both");
 				    	$obj->or_like("description", $value["value"], "both");
 		    		}else{
 		    			$obj->where($value["field"].' '.$value["operator"], $value["value"]);
@@ -114,9 +114,10 @@ class Products extends REST_Controller {
 					"description"	=> $value->description,					
 					"on_hand" 		=> floatval($value->on_hand),					
 					"order_point" 	=> floatval($value->order_point),
-					"favorite" 		=> $value->favorite,
+					"favorite" 		=> $value->favorite==0?false:true,
 					"image_url" 	=> $value->image_url, 	
-					"status" 		=> $value->status,
+					"status" 		=> $value->status==0?false:true,
+					"deleted" 		=> $value->deleted,
 
 					"unit" 			=> $value->unit->get()->name,
 					"cost"			=> $cost,
@@ -145,6 +146,7 @@ class Products extends REST_Controller {
 			$obj->favorite 		= $value->favorite;
 			$obj->image_url 	= $value->image_url;
 			$obj->status 		= $value->status;
+			$obj->deleted 		= isset($value->deleted)?$value->deleted:0;
 
 			if($obj->save()){				
 				//Respsone
@@ -160,6 +162,7 @@ class Products extends REST_Controller {
 					"favorite" 		=> $obj->favorite,
 					"image_url" 	=> $obj->image_url, 	
 					"status" 		=> $obj->status,
+					"deleted" 		=> $obj->deleted,
 
 					"unit" 			=> $obj->unit->get()->name
 				);				
@@ -190,6 +193,7 @@ class Products extends REST_Controller {
 			$obj->favorite 		= $value->favorite;
 			$obj->image_url 	= $value->image_url;
 			$obj->status 		= $value->status;
+			$obj->deleted 		= $value->deleted;
 
 			if($obj->save()){				
 				//Results
@@ -205,6 +209,7 @@ class Products extends REST_Controller {
 					"favorite" 		=> $obj->favorite,
 					"image_url" 	=> $obj->image_url, 	
 					"status" 		=> intval($obj->status),
+					"deleted" 		=> $obj->deleted,
 
 					"unit" 			=> $obj->unit->get()->name
 				);						

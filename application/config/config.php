@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'https://macdawine.local/linabiz/';
+$config['base_url']	= 'https://192.168.1.100/linabiz/';
 
 /*
 |--------------------------------------------------------------------------

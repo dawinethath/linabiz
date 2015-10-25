@@ -76,17 +76,19 @@ class Stocks extends REST_Controller {
 				$data["results"][] = array(
 					"id" 			=> $value->id,					
 					"currency_id"	=> $value->currency_id,
+					"reference_id"	=> $value->reference_id,
 					"contact_id"	=> $value->contact_id,
 					"product_id" 	=> $value->product_id,
 					"unit_id" 		=> $value->unit_id,						
 					"quantity" 		=> floatval($value->quantity), 		
 					"price" 		=> floatval($value->price),					
 					"issued_date" 	=> $value->issued_date,
+					"deleted" 		=> $value->deleted,
 
 					"currency"		=> $value->currency->get_raw()->result(),
 					"contact"		=> $value->contact->get_raw()->result(),
 					"product"		=> $value->product->get_raw()->result(),
-					"unit"			=> $value->unit->get_raw()->result()
+					"unit"			=> $value->unit->get()->name
 				);
 			}
 		}
@@ -102,29 +104,42 @@ class Stocks extends REST_Controller {
 		foreach ($models as $value) {
 			$obj = new Stock(null, $this->entity);
 			$obj->currency_id 	= $value->currency_id;
+			$obj->reference_id 	= $value->reference_id;
 			$obj->contact_id 	= $value->contact_id;
 			$obj->product_id 	= $value->product_id;			
 			$obj->unit_id 		= $value->unit_id;
 			$obj->quantity 		= $value->quantity;
 			$obj->price 		= $value->price;			
 			$obj->issued_date 	= $value->issued_date;
-			
-			if($obj->save()){				
+			$obj->deleted 		= isset($value->deleted)?$value->deleted:0;
+
+			if($obj->save()){
+				$pl = new Price_list(null, $this->entity);
+				$pl->where("product_id", $obj->product_id);
+				$pl->where("unit_id", $obj->unit_id);
+				$pl->get();
+
+				$p = $obj->product->get();
+				$p->on_hand = floatval($p->on_hand) - floatval($pl->unit_value);
+				$p->save();
+
 				//Respsone
 				$data["results"][] = array(
 					"id" 			=> $obj->id,
 					"currency_id"	=> $obj->currency_id,
+					"reference_id"	=> $obj->reference_id,
 					"contact_id"	=> $obj->contact_id,
 					"product_id" 	=> $obj->product_id,					
 					"unit_id"		=> $obj->unit_id, 		
 					"quantity" 		=> $obj->quantity, 		
 					"price" 		=> $obj->price,					
 					"issued_date" 	=> $obj->issued_date,
+					"deleted" 		=> $obj->deleted,
 
 					"currency"		=> $obj->currency->get_raw()->result(),
 					"contact"		=> $obj->contact->get_raw()->result(),
 					"product"		=> $obj->product->get_raw()->result(),
-					"unit"			=> $obj->unit->get_raw()->result()
+					"unit"			=> $obj->unit->get()->name
 				);				
 			}			
 		}
@@ -140,33 +155,37 @@ class Stocks extends REST_Controller {
 		$data["count"] = 0;
 
 		foreach ($models as $value) {			
-			$obj = new Product(null, $this->entity);
+			$obj = new Stock(null, $this->entity);
 			$obj->get_by_id($value->id);
 
 			$obj->currency_id 	= $value->currency_id;
+			$obj->reference_id 	= $value->reference_id;
 			$obj->contact_id 	= $value->contact_id;
 			$obj->product_id 	= $value->product_id;			
 			$obj->unit_id 		= $value->unit_id;
 			$obj->quantity 		= $value->quantity;
 			$obj->price 		= $value->price;			
 			$obj->issued_date 	= $value->issued_date;
+			$obj->deleted 		= $value->deleted;
 
 			if($obj->save()){				
 				//Results
 				$data["results"][] = array(
 					"id" 			=> $obj->id,
 					"currency_id"	=> $obj->currency_id,
+					"reference_id"	=> $obj->reference_id,
 					"contact_id"	=> $obj->contact_id,
 					"product_id" 	=> $obj->product_id,					
 					"unit_id"		=> $obj->unit_id, 		
 					"quantity" 		=> $obj->quantity, 		
 					"price" 		=> $obj->price,					
 					"issued_date" 	=> $obj->issued_date,
+					"deleted" 		=> $obj->deleted,
 
 					"currency"		=> $obj->currency->get_raw()->result(),
 					"contact"		=> $obj->contact->get_raw()->result(),
 					"product"		=> $obj->product->get_raw()->result(),
-					"unit"			=> $obj->unit->get_raw()->result()
+					"unit"			=> $obj->unit->get()->name
 				);						
 			}
 		}
@@ -179,8 +198,8 @@ class Stocks extends REST_Controller {
 	function index_delete() {
 		$models = json_decode($this->delete('models'));
 
-		foreach ($models as $key => $value) {
-			$obj = new Product(null, $this->entity);
+		foreach ($models as $value) {
+			$obj = new Stock(null, $this->entity);
 			$obj->where("id", $value->id)->get();
 			
 			$data["results"][] = array(
@@ -189,6 +208,7 @@ class Stocks extends REST_Controller {
 			);
 							
 		}
+		$data["count"] = count($data["results"]);
 
 		//Response data
 		$this->response($data, 200);

@@ -85,7 +85,7 @@ class Price_lists extends REST_Controller {
 					"price" 		=> floatval($value->price),
 					"unit_value" 	=> floatval($value->unit_value),
 
-					"locale" 		=> $value->currency->get()->locale,
+					"currency" 		=> $value->currency->get_raw()->result(),
 					"unit" 			=> $value->unit->get()->name					
 				);
 			}
@@ -118,7 +118,7 @@ class Price_lists extends REST_Controller {
 					"unit_value" 	=> floatval($obj->unit_value),
 
 					"currency" 		=> $obj->currency->get_raw()->result(),
-					"unit" 			=> $obj->unit->get_raw()->result()
+					"unit" 			=> $obj->unit->get()->name
 				);				
 			}			
 		}
@@ -154,7 +154,7 @@ class Price_lists extends REST_Controller {
 					"unit_value" 	=> floatval($obj->unit_value),
 
 					"currency" 		=> $obj->currency->get_raw()->result(),
-					"unit" 			=> $obj->unit->get_raw()->result()
+					"unit" 			=> $obj->unit->get()->name
 				);						
 			}
 		}

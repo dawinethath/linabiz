@@ -2,42 +2,22 @@
 
 <!-- template section starts -->
 <script type="text/x-kendo-template" id="layout">
-	<div id="menu"></div>				
+	<div id="menu-barr"></div>				
 	<div id="content" class="row-fluid"></div>
 </script>
 <script type="text/x-kendo-template" id="menu-tmpl">
-	<div class="menu-hidden sidebar-hidden-phone fluid menu-left hidden-print">
-		<div class="navbar main" id="main-menu">
-			<ul class="topnav">
-				<li class="dropdown dd-1 span3">
-					<a href="\#" class="dropdown-toggle" data-toggle="dropdown" id="brand-menu">Banhji <span id="current-section"></span></a>
-					<ul class="dropdown-menu" id="dropdownMenu">
-						<li id="home-menu"><a href="#">គេហទំព័រ</a></li>
-						<li id="customer-menu"><a href="#/customer">អតិថិជន</a></li>
-						<li id="vendor-menu"><a href="#/vendor">អក្នផ្គត់ផ្គង់</a></li>
-						<li id="account-menu"><a href="#/products">ទំនិញ</a></li>						
-						<li class="divider"></li>
-						<li id="myac-menu"><a href="#/my">គណនីខ្ញុំ</a></li>
-		        	</ul>
-		        </li>
-			</ul>			
-			<ul class="topnav pull-right">
-				<li data-bind="visible: isAdmin" class="dropdown dd-1">
-					<a href="\#" class="dropdown-toggle" data-toggle="dropdown"><span id="admin">Admin</span></a>
-					<ul class="dropdown-menu" id="dropdownMenu">
-						<li id="home-menu"><a href="#">គេហទំព័រ</a></li>
-						<li id="userList"><a href="#/userList">អ្នកប្រើ</a></li>
-						<li id="branchList"><a href="#/branch">សាខា</a></li>
-						<li id="accountList"><a href="#/accounting">គណនេយ្យ</a></li>
-						<li id="structureList"><a href="#/structure">ថ្នាក់</a></li>
-		        	</ul>
-				</li>
-				<li data-bind="visible: isLogin"><a href="#logout" class="glyphicons power" data-bind="click: logout"><i></i>ចាក់ចេញ</a></li>
-			</ul>
-			<ul class="topnav" id="secondary-menu">
-			</ul>
-		</div>
-	</div>
+    <div class="navbar navbar-inverse hidden-print">
+	  	<div class="navbar-inner">
+		    <a class="brand" href="#/">ROS SOCHEAT</a>
+		    <ul class="nav">
+		      	<li class="active"><a href="#/sale_center">គេហទំព័រ</a></li>
+		      	<li><a href="#/contact_center">អតិថិជន</a></li>
+		      	<li><a href="#/products">ទំនិញ</a></li>
+		      	<li><a href="#/bills">វិក្កយបត្រ</a></li>
+		      	<li><a href="#/sale_summary">របាយការណ៍</a></li>		      	
+		    </ul>
+	  	</div>
+	</div>  
 </script>
 <script type="text/x-kendo-template" id="myId">
 	<div class="container-fluid mainContainer">
@@ -59,7 +39,7 @@
 	<span class="span6">
 		<ul id="module-image">
 			<li>
-				<a href="#/customers">
+				<a href="#/sale_center">
 					<img src="<?php echo base_url(); ?>resources/img/Customer.png" alt="Customer">
 				</a>
 			</li>
@@ -463,7 +443,168 @@
 </script>
 
 
-<!-- //Lina Start -->
+<!-- //Lina Start ============================================= -->
+<script id="saleCenter" type="text/x-kendo-template">
+	<div class="row-fluid">	
+		<div class="span12">
+			<div id="example" class="k-content">
+				<br>
+				<div class="row-fluid">
+					<div class="span3" data-bind="click: loadOpenBill" style="color: white; font-size: 20px; background-color:Purple; border:0px solid black; padding: 10px;">
+						វិក្កយបត្រទិញចូល
+						<br><br>
+						<span data-bind="text: totalBill" ></span>
+						<span style="font-size: 14px">មិនទាន់ទូទាត់</span>
+					</div>
+					
+					<div class="span3" data-bind="click: loadOpenSO" style="color: white; font-size: 20px; background-color:MediumSeaGreen; border:0px solid black; padding: 10px;">
+						បញ្ជាលក់
+						<br><br>
+						<span data-bind="text: totalSO" ></span>
+						<span style="font-size: 14px">មិនទាន់រៀបចំ</span>
+					</div>
+
+					<div class="span3" data-bind="click: loadOpenInvoice" style="color: white; font-size: 20px; background-color:Orange; border:0px solid black; padding: 10px;">
+						វិក្កយបត្រ
+						<br><br>
+						<span data-bind="text: totalOpenInvoice" ></span>
+						<span style="font-size: 14px">មិនទាន់ទូទាត់</span>
+					</div>
+
+					<div class="span3" data-bind="click: loadMinProduct" style="color: white; font-size: 20px; background-color:Crimson; border:0px solid black; padding: 10px;">
+						ទំនិញត្រូវកម្ម៉ង់
+						<br><br>
+						<span data-bind="text: totalMinProduct" ></span>
+						<span style="font-size: 14px">មុខទំនិញ</span>
+					</div>		          	
+	          	</div>
+
+	          	<br>	          	
+
+				<div>
+					<input id="dateSorter" />
+					<input id="startDate" placeHolder="ថ្ងៃទី" />
+					<input id="endDate" placeHolder="ដល់" />
+					<button type="button" id="search" class="btn btn-default"><i class="icon-search"></i></button>				
+				</div>
+
+				<div data-role="grid" 
+					data-bind="source: dataSource"
+					data-auto-bind="false"				    	        
+				    data-row-template="sale-center-row-template"						                           
+				    data-columns='[			    			
+			       		{ title: "កាលបរិច្ឆេទ" },
+			           	{ title: "ឈ្មោះ" },
+			           	{ title: "ប្រភេទ" },					           
+			           	{ title: "លេខកូដ" },
+			           	{ title: "ទឹកប្រាក់" },	            
+			           	{ title: "ស្ថានភាព" },
+			           	{ title: "ធ្វើការ" }                   	                    
+				    ]'></div>				
+			</div><!-- //End div example-->
+		</div><!-- //End div span12-->
+	</div><!-- //End div row-fluid-->	
+</script>
+<script id="sale-center-row-template" type="text/x-kendo-tmpl">
+    <tr>        
+        <td>#=kendo.toString(new Date(issued_date), "dd-MM-yyyy")#</td>
+        <td>#=contact[0]==null?"":contact[0].name#</td>
+        <td>
+        	#if(type==="receipt"){#
+        		បង្កាន់ដៃលក់	       	        		
+			#}else if(type==="so"){#
+        		បញ្ជាលក់
+        	#}else if(type==="estimate"){#        		
+        		សម្រង់តម្លៃ        	
+        	#}else if(type==="bill"){#
+        		<span class="label label-warning">វិក្កយបត្រទិញ</span>
+        	#}else if(type==="po"){#
+        		បញ្ជាទិញ
+        	#}else if(type==="expense"){#
+        		<span class="label label-important">ចំណាយ</span>
+        	#}else if(type==="income"){#
+        		<span class="label label-success">ចំណូល</span>
+        	#}else{#
+        		វិក្កយបត្រ
+        	#}#
+        </td>
+        <td>
+        	#if(type==="invoice"){#								
+				<a href="\#/bills/#=id#"><i></i> #=number#</a>	
+			#}else if(type==="receipt"){#
+        		<a href="\#/bills/#=id#"><i></i> #=number#</a>        	        		
+			#}else if(type==="so"){#
+        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
+        	#}else if(type==="estimate"){#        		
+        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
+        	#}else if(type==="bill"){#        		
+        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
+        	#}else if(type==="po"){#
+        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
+        	#}else if(type==="expense"){#
+        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
+        	#}else if(type==="income"){#
+        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
+        	#}else{#
+        		#=number#
+        	#}#
+        </td>
+        <td align="right">#:kendo.toString(amount, "c")#</td>
+        <td>        	
+        	#if(type==="invoice" || type==="bill"){#
+        		#if(status==="0" || status==="2") {#
+        			# var date = new Date(), dueDate = new Date(due_date).getTime(), toDay = new Date(date).getTime(); #
+					#if(dueDate < toDay) {#
+						# var overDue = Math.floor((toDay - dueDate)/(1000*60*60*24))#
+						#if(overDue==0){#
+							<span class="label label-warning">ត្រូវទូទាត់ថ្ងៃនេះ</span>
+						#}else{#
+							<span class="label label-important">លើសកំណត់ #:overDue# ថ្ងៃ</span>
+						#}#						
+					#} else {#
+						#:Math.floor((dueDate - toDay)/(1000*60*60*24))# ថ្ងៃនឹងត្រូវទូទាត់
+					#}#
+				#} else {#
+					<span class="label label-success">ទូទាត់រួច</span>
+				#}#
+        	#}else if(type==="so"){#
+        		#if(status==="0"){#
+        			មិនទាន់រៀបចំ
+        		#}else{#
+        			រៀបចំរូច        			
+        		#}#
+        	#}else if(type==="estimate"){#        		
+        		#if(status==="0"){#
+        			មិនទាន់យល់ព្រម
+        		#}else{#
+        			យល់ព្រម        			
+        		#}#
+        	#}#			
+		</td> 
+		<td align="center">
+			#if(type==="invoice"){#
+				#if(status==="0" || status==="2"){#					
+					<a href="\#/bills/#=id#"><i></i> ទទួលប្រាក់</a>
+				#}#			
+			#}else if(type==="bill"){#
+        		#if(status==="0" || status==="2"){#					
+					<a href="\#/bills/#=id#"><i></i> ទទួលប្រាក់</a>
+				#}#	
+        	#}else if(type==="so"){#        		
+        		#if(status==="0"){#
+        			
+        		#}#
+        	#}else if(type==="estimate"){#        		
+        		#if(status==="0"){#
+        			
+        		#}#
+        	#}else{#
+
+        	#}#
+		</td>        
+   	</tr>
+</script>
+
 <script id="newProduct" type="text/x-kendo-template">
 	<div class="container-960">
 		<div id="example" class="k-content">
@@ -568,7 +709,7 @@
 					<div align="center">
 						<span id="notification"></span>
 
-						<span id="save" class="btn btn-success btn-icon glyphicons hdd"><i></i>រក្សាទុក</span>
+						<span id="save" class="btn btn-success btn-icon glyphicons ok_2"><i></i>រក្សាទុក</span>
 						<span class="btn btn-danger btn-icon glyphicons delete" data-bind="click: delete, visible: isEdit"><i></i>លុប</span>
 						<span class="btn btn-inverse btn-icon glyphicons remove_2" data-bind="click: cancelChanges"><i></i>បិទ</span>
 					</div>
@@ -600,7 +741,8 @@
 				                		<span data-bind="text: product.name"></span>
 				                	</h4>
 				                	<p>
-				                		ចំនួន: <span data-bind="text: product.on_hand"></span> <br>		                		
+				                		ចំនួន: <span data-bind="text: product.on_hand"></span> 
+				                		<span data-bind="text: product.unit"></span> <br>		                		
 										ពណ៌នា: <span data-bind="text: product.description"></span>										
 				                	</p>
 				            </div>
@@ -656,7 +798,7 @@
 
 					<br>
 
-					<span class="btn btn-success btn-icon glyphicons hdd" data-bind="click: save"><i></i>រក្សាទុក</span>
+					<span class="btn btn-success btn-icon glyphicons ok_2" data-bind="click: save"><i></i>រក្សាទុក</span>
 					<span class="btn btn-danger btn-icon glyphicons remove_2" data-bind="click: closeWindow"><i></i>បិទ</span>  
 				</div>				
 
@@ -705,20 +847,13 @@
 </script>
 <script id="priceList-template" type="text/x-kendo-template">
     <tr>
-    	<td>#=kendo.toString(price, "c", locale)#</td>    	
+    	<td>#=kendo.toString(price, "c", currency[0].locale)#</td>    	
     	<td>#=unit_value#</td>
     	<td>#=unit#</td>    	
     	<td>
-    		<div class="btn-group">
-			  	<button class="btn">Action</button>
-			  	<button class="btn dropdown-toggle" data-toggle="dropdown">
-			    	<span class="caret"></span>
-			  	</button>
-			  	<ul class="dropdown-menu">			   		
-			   		<li><span data-bind="click: delete">លុប</span></li>
-			   		<li><span data-bind="click: edit">កែ</span></li>
-			  	</ul>
-			</div>			
+    		<span data-bind="click: edit"><i class="icon-edit"></i> កែ</span>
+    		|
+    		<span data-bind="click: delete"><i class="icon-remove"></i> លុប</span>
     	</td>
     </tr>
 </script>
@@ -735,9 +870,203 @@
     			<span class="label label-important">#=quantity#</span>
     		#}#
     	</td>
-    	<td>#=unit[0]==null?"":unit[0].name#</td>    	
+    	<td>#=unit#</td>    	
     	<td>#=kendo.toString(price, "c", currency[0].locale)#</td>    	
     </tr>
+</script>
+
+<script id="contactCenter" type="text/x-kendo-template">	
+	<div class="row-fluid">		    
+		<div class="span12">			
+			<div id="example" class="k-content">				
+				<span class="pull-right glyphicons no-js remove_2" 
+					onclick="javascript:window.history.back()" data-bind="click: cancel"><i></i></span>
+				
+				<h3>អតិថិជន</h3>
+
+				<div class="box-generic">
+					<input class="k-textbox" data-bind="value: txtSearch" />
+					ស្វែងរកតាម
+					<input data-role="dropdownlist"
+		            		data-value-primitive="true"				                    
+		                    data-text-field="name"
+		                    data-value-field="id"
+		                    data-bind="value: fieldSearch,
+		                              source: fieldList"
+		                    style="width: 200px;" />
+		                   
+		            <button class="btn" type="button" data-bind="click: search"><i class="icon-search"></i></button>
+		            |
+		            <button class="btn" type="button" data-bind="click: newContact"><i class="icon-plus"></i> អតិថិជនថ្មី</button>
+				</div>
+
+				<div data-role="grid" 
+					data-bind="source: dataSource"
+					data-pageable="true"									    	        
+				    data-row-template="contact-center-row-template"						                           
+				    data-columns='[			    			
+			       		{ title: "លេខកូដ" },
+			           	{ title: "ឈ្មោះ" },
+			           	{ title: "សំគាល់" },			           	
+			           	{ title: "លេខទូរសព្ទ័" },
+			           	{ title: "ប្រភេទ" },
+			           	{ title: "សមតុល្យ" },	            
+			           	{ title: "", width:50 }                   	                    
+				    ]'></div>	
+
+			</div> <!-- // End div example-->  
+		</div> <!-- // End div span12-->			
+	</div> <!-- // End div row-fluid-->	
+</script>
+<script id="contact-center-row-template" type="text/x-kendo-tmpl">
+    <tr>
+		<td>#=number#</td>
+		<td>
+			#if(contact_type_id==5){#
+				#=company#
+			#}else{#
+				#=fullname#
+			#}#
+		</td>
+		<td>#=memo#</td>
+		<td>#=phone#</td>
+		<td>#=contact_type[0]==null?"":contact_type[0].name#</td>
+		<td>#=balance#</td>
+		<td>
+			<a href="\#/contact/#=id#" class="btn-action glyphicons eye_open btn-default"><i></i></a>
+		</td>		
+	</tr>     	
+</script>
+<script id="contact" type="text/x-kendo-template">
+	<div class="container-960">
+		<div class="row-fluid">		    
+			<div class="span12">			
+				<div id="example" class="k-content">
+					<div class="box-generic">
+						<span class="pull-right glyphicons no-js remove_2" 
+							onclick="javascript:window.history.back()" data-bind="click: cancel"><i></i></span>
+						
+						<h3>អតិថិជន</h3>	
+						<br>										
+						<div class="row-fluid">													
+							<div class="span3">											
+								<label for="customerType">ប្រភេទអតិថិជន <span style="color:red">*</span></label>
+								<input id="customerType" name="customerType"
+					            		data-role="dropdownlist"
+					            		data-value-primitive="true"				                    
+					                    data-text-field="name"
+					                    data-value-field="id"
+					                    data-bind="value: contact.contact_type_id,
+					                              source: contactTypeDS"
+					                    data-option-label="(--- ជ្រើសរើស ---)"
+					                    required data-required-msg="ត្រូវការ ប្រភេទអតិថិជន" style="width: 200px;" />														            
+							</div>
+							<div class="span3">						
+					            <label for="currency">រូបិយ​ប័ណ្ណ <span style="color:red">*</span></label>
+					            <input id="currency" name="currency"
+					            		data-role="dropdownlist"
+					            		data-value-primitive="true"				                    
+					                    data-text-field="code"
+					                    data-value-field="id"
+					                    data-bind="value: contact.currency_id,
+					                              source: currencyDS"
+					                    data-option-label="(--- ជ្រើសរើស ---)"
+					                    required data-required-msg="ត្រូវការ រូបិយ​ប័ណ្ណ" style="width: 200px;" />				            				            
+					        </div>
+							<div class="span3">
+								<label for="customerStatus">ស្ថានភាព <span style="color:red">*</span></label>							              	
+			              		<input id="customerStatus" name="customerStatus" data-role="dropdownlist"
+				            		data-text-field="name"
+	           						data-value-field="id"
+	           						data-value-primitive="true" 
+				            		data-bind="source: statusList, value: contact.status"					            							            		
+				            		data-option-label="(--- ជ្រើសរើស ---)"
+				            		required data-required-msg="ត្រូវការ ស្ថានភាព" style="width: 200px;" />							              	
+							</div>								
+							<div class="span3">
+								<label for="registered_date">ថ្ងៃចុះឈ្មោះ <span style="color:red">*</span></label>
+					            <input id="registered_date" name="registered_date" 
+					            		data-role="datepicker"			            		
+		            					data-bind="value: contact.registered_date" 
+		            					data-format="dd-MM-yyyy"
+		            					data-parse-formats="yyyy-MM-dd" 
+		            					placeholder="ថ្ងែ-ខែ-ឆ្នាំ" required data-required-msg="ត្រូវការ ថ្ងៃចុះឈ្មោះ" style="width: 200px;" />
+							</div>																						
+						</div>						
+
+						<br>
+						<div class="separator line bottom"></div>
+
+						<div class="row-fluid">							
+							<div class="span3">
+								<label for="surname">គោត្តនាម </label>
+			              		<input id="surname" name="surname" class="k-textbox" data-bind="value: contact.surname" 
+					              		placeholder="ត្រកូល"
+					              		style="width: 200px;" />
+							</div>
+							<div class="span3">							
+								<label for="name">នាម <span style="color:red">*</span></label>
+					            <input id="name" name="name" class="k-textbox" data-bind="value: contact.name" 
+					              		placeholder="ឈ្មោះ" required data-required-msg="ត្រូវការ នាម"
+					              		style="width: 200px;" />
+							</div>
+							<div class="span3">
+								<label for="companyName">ក្រុមហ៊ុន </label>
+								<input class="k-textbox" data-bind="value: contact.company"									
+										placeholder="e.g. PCG & Partner"
+										style="width: 200px;" />	
+							</div>
+							<div class="span3">						
+								<label for="number">លេខកូដ</label>
+		              			<input id="number" name="number" class="k-textbox"
+			              				data-bind="value: contact.number" 
+			              				placeholder="e.g. AB0001" style="width: 200px;" />		              		
+							</div>										
+						</div>
+
+						<br>
+						<div class="separator line bottom"></div>
+
+						<div class="row-fluid">					
+							<div class="span3">						
+								<label for="phone">លេខទូរសព្ទ័</label>
+		              			<input id="phone" name="phone" class="k-textbox"
+			              				data-bind="value: contact.phone" 
+			              				placeholder="e.g. 012333444" style="width: 200px;" />		              		
+							</div>
+							<div class="span3">						
+								<label for="gender">ភេទ</label>
+		              			<select data-role="dropdownlist" 
+		              					data-bind="source: genders, value: contact.gender"
+		              					style="width: 200px;"></select>		              		
+							</div>
+							<div class="span3">						
+								<label for="address">អាស័យដ្ឋាន</label>
+		              			<input class="k-textbox" data-bind="value: contact.address" style="width: 200px;" />	              		
+							</div>
+							<div class="span3">						
+								<label for="memo">សំគាល់</label>
+		              			<input class="k-textbox" data-bind="value: contact.memo" style="width: 200px;" />	              		
+							</div>											
+						</div>
+
+						<br>
+						<div class="separator line bottom"></div>
+						
+						<!-- //Form actions -->
+						<div align="center">
+							<span id="notification"></span>
+
+							<span id="save" class="btn btn-success btn-icon glyphicons ok_2"><i></i>រក្សាទុក</span>
+							<span class="btn btn-danger btn-icon glyphicons delete" data-bind="click: delete, visible: isEdit"><i></i>លុប</span>
+							<span class="btn btn-inverse btn-icon glyphicons remove_2" data-bind="click: cancelChanges"><i></i>បិទ</span>
+						</div>
+					</div>
+					<!-- // Form actions END -->							
+				</div> <!-- // End div example-->  
+			</div> <!-- // End div span12-->
+		</div>		
+	</div> <!-- // End div row-fluid-->	
 </script>
 
 <script id="product" type="text/x-kendo-template">
@@ -760,7 +1089,7 @@
 		            </li>
 		            <li class="glyphicons circle_plus"><a href="#/new_product"><i></i> មុខទំនិញថ្មី </a>
 		            </li>
-		            <li class="glyphicons shopping_cart"><a href="#/bills"><i></i> រទេះទំនិញ </a>
+		            <li class="glyphicons shopping_cart"><a href="#/bills"><i></i> រទេះទំនិញ (<span data-bind="text: countItem"></span>) </a>
 		            </li>	            
 		        </ul>
 		    </div>
@@ -788,7 +1117,7 @@
 		            	 data-auto-bind="false"
 		            	 data-selectable="true"			                 
 		                 data-template="vendor-search-template"
-		                 data-bind="source: contactDS, events:{ change: vendorChanges}"></div>
+		                 data-bind="source: vendorDS, events:{ change: vendorChanges}"></div>
 		        </div>
 		        <!-- // Vendor Tab content END -->		        
 		    </div>
@@ -811,8 +1140,7 @@
 	                <th>លេខកូដ</th>
 	                <th>មុខទំនិញ</th>
 	                <th>ពណ៌នា</th>
-	                <th>ចំនួន</th>
-	                <th>ទិញ</th>
+	                <th>ចំនួន</th>	                
 	                <th>លក់</th>	                
 	                <th></th>
 	            </tr>
@@ -822,10 +1150,11 @@
 	        	data-bind="source: dataSource"></tbody>
 	    </table>
 	    <div id="pager" class="k-pager-wrap"
+	    	 data-auto-bind="false"
              data-role="pager" data-bind="source: dataSource"></div>
 
         <div id="cart-window" data-role="window" data-visible="false" data-modal="true" data-resizable="false" data-iframe="true">				    	
-			<table class="table table-bordered table-condensed">
+			<table class="table table-striped">
 				<thead>
 					<thead>
 			            <tr>			                
@@ -839,41 +1168,48 @@
 				<tbody>
 					<tr>					
 						<td>
-							<input type="text" class="k-textbox" data-bind="value: cart[0].description" />
+							<input type="text" class="k-textbox" data-bind="value: description" />
 						</td>
 						<td>
 							<input data-role="numerictextbox" 
 									data-format="n" data-min="0"
-									data-bind="value: cart[0].quantity, events: {change : change}" />
+									data-bind="value: quantity, events: {change : onChange}" />
 
 							<input data-role="dropdownlist"                   
 				                   data-text-field="unit"
 				                   data-value-field="unit_id"
 				                   data-value-primitive="true"
-				                   data-bind="value: cart[0].unit_id,
-				                              source: priceListDS, 
-				                              events: {change : priceChanges}" />
+				                   data-bind="value: unit_id,
+				                              source: priceList, 
+				                              events: {change : priceChanges}" 
+				                              style="width: 100px;" />
 						</td>				
-						<td>
-							<input type="text" class="k-textbox" data-bind="value: cart[0].price" />
+						<td>							
+							<input data-role="numerictextbox" 
+									data-format="n" data-min="0"
+									data-bind="value: price, events: {change : onChange}" />
 
 							<input data-role="dropdownlist"                   
 				                   data-text-field="code"
 				                   data-value-field="id"
-				                   data-bind="value: cart[0].currency_id,
-				                              source: currencyDS" />
+				                   data-bind="value: currency_id,
+				                              source: currencyDS,
+				                              events: {change : currencyChanges}"
+				                              style="width: 60px;" />
 						</td>		
 						<td align="right">			
-							<span data-bind="text: cart[0].amount"></span>			
+							<span class="middle strong" data-bind="text: amount"></span>			
 						</td>					
 					</tr>
 				</tbody>
-			</table>
+			</table>			
+
+			<div align="right">
+				<span class="btn btn-success btn-icon glyphicons shopping_cart" data-bind="click: addToCart"><i></i>ដាក់ចូលរទេះ</span>
+				<span class="btn btn-danger btn-icon glyphicons remove_2" data-bind="click: closeWindow"><i></i>បិទ</span>  
+			</div>
 
 			<br>
-
-			<span class="btn btn-success btn-icon glyphicons shopping_cart" data-bind="click: addToCart"><i></i>ដាក់ចូលរទេះ</span>
-			<span class="btn btn-danger btn-icon glyphicons remove_2" data-bind="click: closeWindow"><i></i>បិទ</span>  
 		</div>
 
 	</div>
@@ -883,13 +1219,23 @@
     	<td>#=sku#</td>
     	<td>#=name#</td>
     	<td>#=description#</td>
-    	<td>#=on_hand# / #=unit==null?"null":unit#</td>
     	<td>
-    		<span class="badge badge-success"> #=kendo.toString(cost.price, "c", cost.locale)# </span> / #=cost.unit#
-    	</td>
+    		#if(on_hand<=order_point){#    		
+    			<span class="badge badge-danger">#=kendo.toString(on_hand, "n0")#</span>
+    		#}else{#
+    			<span class="badge badge-info">#=kendo.toString(on_hand, "n0")#</span>
+    		#}#
+
+    		#=unit==null?"":unit#
+    	</td>    	
     	<td>
-    		#for(var i=0; i<price_lists.length; i++) {#    			
-    			<span class="badge badge-success"> #=kendo.toString(price_lists[i].price, "c", price_lists[i].locale)# </span> / #=price_lists[i].unit# <br>    						 
+    		#for(var i=0; i<price_lists.length; i++) {#
+    			#if(price_lists[i].price>0){#
+    				<span class="badge badge-inverse"> #=kendo.toString(price_lists[i].price, "c", price_lists[i].locale)# </span> / #=price_lists[i].unit# 
+    			#}else{#
+    				<span class="badge badge-danger"> #=kendo.toString(price_lists[i].price, "c", price_lists[i].locale)# </span> / #=price_lists[i].unit#
+    			#}#
+    			<br>    			    						 
 			#}#
     	</td>    	
     	<td>
@@ -1066,7 +1412,7 @@
 					<div align="center">
 						<span id="notification"></span>
 
-						<span id="save" class="btn btn-success btn-icon glyphicons hdd"><i></i>រក្សាទុក</span>
+						<span id="save" class="btn btn-success btn-icon glyphicons ok_2"><i></i>រក្សាទុក</span>
 						<span class="btn btn-danger btn-icon glyphicons delete" data-bind="click: delete, visible: isEdit"><i></i>លុប</span>
 						<span class="btn btn-inverse btn-icon glyphicons remove_2" data-bind="click: cancelChanges"><i></i>បិទ</span>
 					</div>	
@@ -1077,37 +1423,58 @@
 </script>
 
 <script id="bill" type="text/x-kendo-template">
-	<div class="container-960">
-		<div id="example" class="k-content">				
+	<div class="container-960">	
+		<div id="example" class="k-content">
+			<br>
+			<div class="box-generic">
 				<span class="pull-right glyphicons no-js remove_2" 
 						onclick="javascript:window.history.back();"><i></i></span>				
 
 				<h3>រទេះទំនិញ</h3>
 
-				<table class="table table-borderless table-condensed">
+				<div class="box-generic">
+					ស្វែងរក
+					<input id="ddlCustomer" data-bind="value: name" style="width: 250px;" />
+					<button class="btn" type="button" data-bind="click: removeSearch"><i class="icon-remove"></i></button>							
+					|							
+				  	<input class="k-textbox" data-bind="value: phone, events: {change : phoneSearch}" placeholder="ទូរស័ព្ទ..." autofocus />
+				  	<button class="btn" type="button" data-bind="click: phoneSearch"><i class="icon-search"></i></button>							  	
+				</div>
+
+				<table class="table table-borderless table-condensed">					
 					<tr>
+						<td>អតិថិជន</td>
+						<td>
+							<input class="k-textbox" type="text" data-bind="value: contact.name" style="width: 100%;" />					
+						</td>
 						<td>ប្រភេទ</td>
 						<td>
-							<select data-bind="value: bill.type" style="width: 100%;">
-							  	<option value="invoice">វិក្កយបត្រ</option>
-								<option value="receipt">បង្កាន់ដៃលក់</option>
-								<option value="so">បញ្ជាលក់</option>
-								<option value="gdn">លិខិតដឹកជញ្ជូន</option>
-							</select>
+							<input data-role="dropdownlist"				                   
+				                   data-value-primitive="true"
+				                   data-text-field="name"
+				                   data-value-field="id"
+				                   data-bind="value: bill.type,
+				                              source: typeList"
+				                   style="width: 100%;" />
 						</td>
-						<td>លេខ</td>
-						<td>
-							<input type="text" class="k-textbox" data-bind="value: bill.number" style="width: 100%;" />
-						</td>						
 					</tr>
 			    	<tr>
 			    		<td>ទូរស័ព្ទ</td>
 			    		<td>
-			    			<div class="input-append">
-							  	<input class="k-textbox" type="text" data-bind="value: contact.phone, events: {change : phoneSearch}" />
-							  	<button class="btn" type="button" data-bind="click: phoneSearch"><i class="icon-search"></i></button>
-							</div>
-			    		</td>			    		
+			    			<input class="k-textbox" type="text" 
+			    					data-bind="value: contact.phone"
+			    					style="width: 100%;" />
+			    		</td>
+			    		<td>លេខ</td>
+						<td>
+							<input type="text" class="k-textbox" data-bind="value: bill.number" style="width: 100%;" />
+						</td>			    						
+			    	</tr>
+			    	<tr>
+			    		<td>អាស័យដ្ឋាន</td>			    		
+			    		<td>
+			    			<input type="text" class="k-textbox" style="width:100%" data-bind="value: bill.address" />
+			    		</td>
 			    		<td>ថ្ងៃចេញវិក្កបត្រ</td>
 						<td>
 							<input id="issuedDate" name="issuedDate"
@@ -1116,15 +1483,12 @@
 				                    data-bind="value: bill.issued_date"
 				                    style="width: 100%"
 				                    required data-required-msg="ត្រូវការ ថ្ងៃចេញវិក្កបត្រ" />
-						</td>				
+						</td>			    					    		
 			    	</tr>
-			    	<tr>		    		
-			    		<td>អតិថិជន</td>
-			    		<td>			    			
-			    			<div class="input-append">
-							  	<input class="k-textbox" type="text" data-bind="value: contact.name" />
-							  	<button class="btn" type="button"><i class="icon-search"></i></button>
-							</div>			    			
+			    	<tr>			    		
+			    		<td>សំគាល់</td>
+			    		<td>
+			    			<input type="text" class="k-textbox" style="width:100%" data-bind="value: bill.memo" />
 			    		</td>
 			    		<td>ថ្ងៃផុតកំណត់</td>
 						<td>
@@ -1134,70 +1498,132 @@
 				                    data-bind="value: bill.due_date"
 				                    style="width: 100%"
 				                    required data-required-msg="ត្រូវការ ថ្ងៃផុតកំណត់" />
-						</td>			    		
+						</td>
+			    	</tr>
+			    </table>		    	
+		    	
+		    	<span class="glyphicons no-js circle_plus" data-bind="click: addRow"><i></i></span>
+		    	<a href="#/products" class="glyphicons no-js shopping_cart"><i></i></a>
+		    	<br><br>
+
+		    	<div data-role="grid" 
+					data-bind="source: lineDS"
+				    data-auto-bind="false"	        
+				    data-row-template="bill-row-template"						                           
+				    data-columns='[			    			
+			       		{ title: "ល.រ <br> No", width: 50 },
+			           	{ title: "មុខទំនិញ <br> Items" },				           
+			           	{ title: "ចំនួន <br> Qty" },
+			           	{ title: "តំលៃ <br> Price" },	            
+			           	{ title: "សរុប <br> Amount", width: 100 }                   	                    
+				    ]'></div>			   
+
+			    <table class="pull-left">
+			    	<tr>
+			    		<td>អត្រាប្ដូរប្រាក់ ​1 USD</td>
+			    		<td>
+			    			<input data-role="numerictextbox"
+								data-format="c0" data-min="0" data-culture="km-KH"
+								data-bind="value: bill.rate, events: {change : onChange}" />
+			    		</td>
 			    	</tr>
 			    	<tr>
-			    		<td>អាស័យដ្ឋាន</td>			    		
+			    		<td>បង់ប្រាក់ ​USD</td>
 			    		<td>
-			    			<input type="text" class="k-textbox" style="width:100%" data-bind="value: bills.address" />
+			    			<input data-role="numerictextbox" 
+								data-format="c" data-min="0"
+								data-bind="value: bill.paid_usd, events: {change : onChange}" />
 			    		</td>
-			    		<td>សំគាល់</td>
+			    	</tr>
+			    	<tr>
+			    		<td>បង់ប្រាក់ KHR</td>
 			    		<td>
-			    			<input type="text" class="k-textbox" style="width:100%" data-bind="value: bills.memo" />
+			    			<input data-role="numerictextbox" 
+								data-format="c0" data-min="0" data-culture="km-KH"
+								data-bind="value: bill.paid_khr, events: {change : onChange}" />
+			    		</td>
+			    	</tr>
+			    	<tr>
+			    		<td><span class="label label-success">ប្រាក់អាប់ USD</span></td>
+			    		<td>
+			    			<input data-role="numerictextbox" 
+								data-format="c" readonly
+								data-bind="value: bill.changes" />
+			    		</td>
+			    	</tr>
+			    	<tr>
+			    		<td><span class="label label-inverse">ប្រាក់អាប់ KHR</span></td>
+			    		<td>
+			    			<input data-role="numerictextbox" 
+								data-format="c0" readonly
+								data-culture="km-KH"
+								data-bind="value: changes_khr" />
 			    		</td>
 			    	</tr>
 			    </table>
-		    
-			    <table class="table table-bordered table-condensed">
-			    	<thead>
-			            <tr>
-			                <th style="width: 1%;" class="center">ល.រ <br> No</th>
-			                <th>មុខទំនិញ <br> Items</th>
-			                <th>ចំនួន <br> Qty</th>
-			                <th>តម្លៃ <br> Price</th>	                
-			                <th>សរុប <br> Amount</th>
-			            </tr>
-			        </thead>
-			        <tbody data-template="bill-row-template" 
-			        		data-auto-bind="false" 
-			        		data-bind="source: lineDS"></tbody>		       	             
-			    </table>
 					
-				<table width="100%">
-					<tbody>
-						<tr>
-							<td>អ្នកទិញ / Buyer</td>
-							<td align="center">អ្នកលក់ / Seller</td>					
-							<td align="right" width="17%">សរុប (USD):</td>
-							<td align="right" class="strong" width="30%">
-								<span data-bind="text: bill.memo"></span>
-							</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td></td>					
-							<td align="right">សរុប (រៀល):</td>
-							<td align="right" class="strong">
-								<span data-bind="text: bill.memo"></span>
-							</td>
-						</tr>						
-					</tbody>
+				<table class="pull-right">											
+					<tr>
+						<td>សរុបរង USD</td>
+						<td>
+							<input data-role="numerictextbox"
+								data-format="c" readonly
+								data-min="0"
+								data-bind="value: sub_total" />
+						</td>
+					</tr>
+					<tr>
+						<td>ពិន័យ USD</td>
+						<td>
+							<input data-role="numerictextbox" 
+								data-format="c" data-min="0"
+								data-bind="value: bill.fine, events: {change : onChange}" />
+						</td>
+					</tr>
+					<tr>
+						<td>បញ្ចះុតំលៃ USD</td>
+						<td>
+							<input data-role="numerictextbox" 
+								data-format="c" data-min="0"
+								data-bind="value: bill.discount, events: {change : onChange}" />
+						</td>
+					</tr>
+					<tr>
+						<td><span class="label label-success">សរុប USD</span></td>
+						<td>
+							<input data-role="numerictextbox"
+								data-format="c" readonly
+								data-bind="value: bill.amount" />
+						</td>
+					</tr>					
+					<tr>					
+						<td><span class="label label-inverse">សរុប KHR</span></td>
+						<td>
+							<input data-role="numerictextbox" 
+								data-format="c0" readonly
+								data-culture="km-KH"
+								data-bind="value: amount_khr" />
+						</td>
+					</tr>					
 				</table>
-
-				<div align="center">
+				
+				<div align="center" style="clear: both;">
 					<span id="notification"></span>
 
-					<span id="save" class="btn btn-success btn-icon glyphicons hdd"><i></i>រក្សាទុក</span>
+					<span id="save" class="btn btn-success btn-icon glyphicons ok_2"><i></i>រក្សាទុក</span>
 					<span class="btn btn-danger btn-icon glyphicons delete" data-bind="click: delete, visible: isEdit"><i></i>លុប</span>
+					<span class="btn btn-info btn-icon glyphicons print" data-bind="click: print, visible: isEdit"><i></i>បោះពុម្ព</span>
 					<span class="btn btn-inverse btn-icon glyphicons remove_2" data-bind="click: cancelChanges"><i></i>បិទ</span>
 				</div>			
+			</div>
 		</div>
 	</div>
 </script>
 <script id="bill-row-template" type="text/x-kendo-tmpl">
     <tr>
 		<td class="center">
-			#=id#
+			<i class="icon-trash" data-bind="click: removeRow"></i>
+			<span class="sno"></span>
 		</td>
 		<td>
 			<input type="text" class="k-textbox" data-bind="value: description" style="width: 100%;" />
@@ -1205,28 +1631,34 @@
 		<td>
 			<input data-role="numerictextbox" 
 					data-format="n" data-min="1"
-					data-bind="value: quantity, events: {change : change}" style="width: 70px;" />
-			<input data-role="dropdownlist"                   
-                   data-text-field="name"
-                   data-value-field="id"
+					data-bind="value: quantity, events: {change : onChange}" style="width: 100px;" />
+			<input data-role="dropdownlist"
+				   data-option-label="(---រើស---)"                   
+                   data-text-field="unit"
+                   data-value-field="unit_id"
                    data-bind="value: unit_id,
-                              source: unitDS"
+                              source: priceList,
+                              events: {change : unitChanges}"
                    style="width: 100px;" />
 		</td>				
 		<td>
 			<input data-role="numerictextbox" 
 					data-format="n"
-					data-bind="value: price, events: {change : change}" style="width: 100px;" />
+					data-bind="value: price, events: {change : onChange}" style="width: 100px;" />
 			<input data-role="dropdownlist"                   
                    data-text-field="code"
                    data-value-field="id"
                    data-bind="value: currency_id,
-                              source: currencyDS"
+                              source: currencyList"
                               style="width: 60px;" />
 		</td>		
 		<td align="right">			
 			#amount = kendo.parseFloat(quantity)*kendo.parseFloat(price)#
-			#=kendo.toString(amount, "c", locale)#			
+			#if(currency_id==2){#
+				#=kendo.toString(amount, "c0", "km-KH")#
+			#}else{#
+				#=kendo.toString(amount, "c")#
+			#}#	
 		</td>					
 	</tr>     	
 </script>
@@ -1247,7 +1679,10 @@
 			<h5 align="center">ផ្គត់ផ្គង់គ្រឿងសំណង់គ្រប់ប្រភេទ <br> មានលក់ ឥដ្ឋ ខ្សាច់ ថ្ម សីុម៉ង់ត៍ ដែក បោះដំុ និង រាយ មានដឹកជញ្ជូនដល់ទីកន្លែង </h5>
 			<h5 align="center"><span style="font-size:small;">ផ្ទះលេខ 728 ផ្លូវវេងស្រេង ភូមិត្រពាំងថ្លឹង​ សង្កាត់ចោមចៅ ខណ្ឌពោធិ៍សែនជ័យ រាជធានីភ្នំពេញ</span> <br> 017 47 21 54 / 087 700 702 / 0888 700 702</h5>
 			
-		    <h4 align="center">វិក្កយបត្រ <span style="color: black;">Invoice</span></h4>
+			<div align="center" style="font-size: medium;">			
+			    <span data-bind="text: invoiceTypeKH"></span> |
+			    <span data-bind="text: invoiceType"></span>
+		    </div>
 	    
 		    <table width="100%">
 		    	<tr>
@@ -1299,7 +1734,7 @@
 						<td align="center">អ្នកលក់ / Seller</td>					
 						<td align="right" width="17%">សរុប (USD):</td>
 						<td align="right" class="strong" width="30%">
-							<span data-bind="text: bill.memo"></span>
+							<span data-bind="text: total_usd"></span>
 						</td>
 					</tr>
 					<tr>
@@ -1307,7 +1742,7 @@
 						<td></td>					
 						<td align="right">សរុប (រៀល):</td>
 						<td align="right" class="strong">
-							<span data-bind="text: bill.memo"></span>
+							<span data-bind="text: total_khr"></span>
 						</td>
 					</tr>						
 				</tbody>
@@ -1324,25 +1759,137 @@
 <script id="invoice-print-row-template" type="text/x-kendo-tmpl">
     <tr>
 		<td class="center">
-			#=id#
+			<span class="sno"></span>
 		</td>
 		<td style="font-size: x-small;">#=description#</td>
-		<td class="center"><span style="font-size:x-small;">#=quantity#</span> <span style="font-size:xx-small;">#=unit#</span></td>
+		<td class="center"><span style="font-size:x-small;">#=quantity#</span> <span style="font-size:xx-small;">#=unit[0]==null?"":unit[0].name#</span></td>
 		<td class="right" style="font-size:x-small;">
-			#if(locale=="km-KH"){#
-				#=kendo.toString(price, "c0", locale)#
+			#if(currency[0].locale=="km-KH"){#
+				#=kendo.toString(price, "c0", currency[0].locale)#
 			#}else{#
-				#=kendo.toString(price, "c", locale)#
+				#=kendo.toString(price, "c", currency[0].locale)#
 			#}#
 		</td>
 		<td class="right" style="font-size:x-small;">
-			#if(locale=="km-KH"){#
-				#=kendo.toString(amount, "c0", locale)#
+			#if(currency[0].locale=="km-KH"){#
+				#=kendo.toString(amount, "c0", currency[0].locale)#
 			#}else{#
-				#=kendo.toString(amount, "c", locale)#
+				#=kendo.toString(amount, "c", currency[0].locale)#
 			#}#			
 		</td>					
 	</tr>     	
+</script>
+
+<script id="saleSummary" type="text/x-kendo-template">
+	<div class="container-960">
+		<div id="example" class="k-content">		
+
+			<div class="hidden-print">
+				<span class="pull-right glyphicons no-js remove_2" 
+					onclick="javascript:window.history.back()"><i></i></span>
+
+				<input id="dateSorter" />
+				<input id="startDate" placeHolder="ថ្ងៃទី" />
+				<input id="endDate" placeHolder="ដល់" />	
+
+				<button id="search" type="button" class="btn btn-default"><i class="icon-search"></i></button>
+				<button type="button" class="btn btn-default" onclick="javascript:window.print()"><i class="icon-print"></i></button>							
+			</div>
+
+			<br>
+
+			<div align="center">
+				<h4>របាយការណ៍សង្ខេប ចំណូល និង ចំណាយ</h4>
+				
+				<span id="lblStartDate"></span>																	
+				<span id="lblEndDate"></span>									
+			</div>
+
+			<br>
+			
+			<div class="box-generic">				
+				<table class="table table-condensed table-vertical-center table-thead-simple">
+					<thead>
+						<tr>																			
+							<th>ពណ៌នា</th>
+							<th class="center">ទឹកប្រាក់</th>							
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="selectable">													
+							<td class="important">លក់</td>				
+							<td class="center">
+								$ <span data-bind="text: obj.sale"></span>
+							</td>							
+						</tr>
+						<tr class="selectable">													
+							<td class="important">អតិថិជនជំពាក់</td>				
+							<td class="center">
+								$ <span data-bind="text: obj.unpaid"></span>
+							</td>							
+						</tr>
+						<tr class="selectable alert-info">													
+							<td class="important strong">ចំណូល</td>				
+							<td class="right">
+								$ <span data-bind="text: obj.income"></span>
+							</td>						
+						</tr>
+						<tr class="selectable">													
+							<td class="important">ទិញ</td>				
+							<td class="center">
+								$ <span data-bind="text: obj.bill"></span>
+							</td>						
+						</tr>
+						<tr class="selectable">													
+							<td class="important">ជំពាក់អ្នកផ្គត់ផ្គង់</td>				
+							<td class="center">
+								$ <span data-bind="text: obj.unbill"></span>
+							</td>						
+						</tr>
+						<tr class="selectable">													
+							<td class="important">ប្រាក់ខែ</td>				
+							<td class="center">
+								$ <span data-bind="text: obj.salary"></span>
+							</td>							
+						</tr>
+						<tr class="selectable">													
+							<td class="important">ដកប្រាក់</td>				
+							<td class="center">
+								$ <span data-bind="text: obj.witdraw"></span>
+							</td>							
+						</tr>
+						<tr class="selectable">													
+							<td class="important">ចំណាយផ្សេងៗ</td>				
+							<td class="center">
+								$ <span data-bind="text: obj.salary"></span>
+							</td>							
+						</tr>
+						<tr class="selectable alert-danger">													
+							<td class="important strong">ចំណាយ</td>				
+							<td class="right">
+								$ <span data-bind="text: obj.expense"></span>
+							</td>							
+						</tr>						
+						<tr class="selectable">													
+							<td class="important">វិនិយោគ</td>				
+							<td class="right">
+								$ <span data-bind="text: obj.invest"></span>
+							</td>							
+						</tr>																	
+					</tbody>
+					<tfoot>
+					    <tr class="selectable">													
+							<td class="important strong" style="font-size: medium; text-decoration: underline;">សរុប</td>
+							<td class="right strong" style="font-size: medium; text-decoration: underline;">
+								$ <span data-bind="text: obj.sale"></span>
+							</td>														
+						</tr>
+					</tfoot>
+				</table>						
+			</div>			
+
+		</div>
+	</div>
 </script>
 <!-- Lina End -->
 
@@ -2012,7 +2559,7 @@
         framePrint : false,
         searchField : "",
         
-        dataSource 	: dataStore(baseUrl + "rinvoices/index"),
+        dataSource 	: dataStore(baseUrl + "rinvoices"),
 
         pageLoad    : function(){
             
@@ -2052,11 +2599,189 @@
                 $(".hiddenPrintFrame").css("visibility", "visible");
             }
         }
-    });	
+    });
+	banhji.contactCenter =  kendo.observable({    	
+    	dataSource 		: dataStore(baseUrl + "contacts"),
+    	 
+    	fieldList 		: [
+    		{ id:"phone", name:"លេខទូរសព្ទ័" },
+    		{ id:"name", name:"ឈ្មោះ" },
+    		{ id:"surname", name:"គោត្តនាម" },
+    		{ id:"company", name:"ក្រុមហ៊ុន" },
+    		{ id:"number", name:"លេខកូដ" },
+    		{ id:"status", name:"ស្ថានភាព" }
+    	],
+
+    	txtSearch 		: "",
+    	fieldSearch 	: "phone",
+
+    	pageLoad 		: function(){
+    		
+    	},
+    	search 			: function(){
+    		if(this.get("txtSearch")!==""){
+    			this.dataSource.filter({ field: this.get("fieldSearch"), operator: "contains", value: this.get("txtSearch") });
+    		}
+    	},
+    	newContact 		: function(){
+    		banhji.router.navigate('/contact');
+    	}
+    });
+	banhji.contact = kendo.observable({		
+		dataSource 	: dataStore(baseUrl + "contacts"),
+		contactTypeDS: dataStore(baseUrl + "contacts/type"),
+		currencyDS 	: dataStore(baseUrl + "currencies"),
+
+		contact 	: null,			
+		genders		: ["M", "F"],
+		statusList 	: [            
+			{ "id": 1, "name": "កំពុងប្រើប្រាស់" },
+			{ "id": 2, "name": "ផ្អាក់ប្រើប្រាស់" },
+			{ "id": 0, "name": "ឈប់ប្រើប្រាស់" }
+        ],		
+		
+		pageLoad 	: function(id){						
+			if(id){						
+				this.loadContact(id);
+			}else{				
+				this.addEmpty();
+			}			
+		},
+		loadContact		: function(id){
+    		var self = this;
+    		
+	    	this.dataSource.query({			    		    			
+				filter: { field:"id", value: id }
+			}).then(function(e){
+				var view = self.dataSource.view();
+					    	
+	    		self.set("contact", view[0]);	    			    		
+			});					
+    	},      			
+      	addEmpty 	: function(){
+      		if(this.dataSource.total()==0){
+				this.dataSource.add({									
+					currency_id 	: 0,
+					user_id 		: 0,
+					contact_type_id : 0,														
+					number			: "",			
+					surname			: "",	
+					name			: "",				  	  
+					gender			: "M",	
+					dob				: "",
+					pob				: "",
+					address 		: "",									
+					family_member	: "",
+					id_number 		: "",
+					phone 			: "",
+					email 			: "",
+					job				: "",
+					company			: "",					
+					image_url 		: "",
+					memo			: "",
+					credit_limit 	: 0,												
+					registered_date	: new Date(),
+					status			: 1
+				});
+				
+				var data = this.dataSource.data();			
+				var obj = data[data.length - 1];			
+				this.set("contact", obj);
+			}	
+		},
+		cancel: function(e){
+			e.preventDefault();
+
+			this.dataSource.cancelChanges();			
+		},
+		save 		: function(){
+			var self = this;
+			this.dataSource.sync();
+
+			var saved = false;			
+			this.dataSource.bind("requestEnd", function(e){
+				if(saved==false){
+					saved = true;
+
+					self.dataSource.data([]);					
+					self.addEmpty();
+				}				
+			});
+		}
+	});
+    banhji.saleCenter =  kendo.observable({    	
+    	dataSource 		: dataStore(baseUrl + "bills"),
+    	outstandingDS 	: dataStore(baseUrl + "bills/outstanding"),    	
+    	
+    	searchField		: "",
+    	stock 			: null,
+    	product_id 		: 0,
+    	isEdit 			: false,
+
+    	totalBill 		: 0,
+    	totalSO 		: 0,
+    	totalOpenInvoice: 0,
+    	totalOverDue 	: 0,
+
+    	pageLoad 		: function(){
+    		this.dataSource.query({
+    			filter: { field:"deleted", value: 0 },
+    			sort: [
+    				{ field: "issued_date", dir: "desc" },
+    				{ field: "id", dir: "desc" }
+    			]
+    		});
+
+    		this.loadOutStandingInvoice();
+    	},
+    	loadOutStandingInvoice : function(){
+			var self = this;
+
+			this.outstandingDS.filter([]);						
+			this.outstandingDS.bind("requestEnd", function(e){
+				var response = e.response.results;
+				
+				self.set("totalBill", response[0].totalBill);
+			  	self.set("totalSO", response[1].totalSO);
+			  	self.set("totalOpenInvoice", response[2].totalOpenInvoice);
+			  	self.set("totalMinProduct", response[3].totalMinProduct);			  	
+			});							
+		},
+    	loadOpenBill 	: function(){
+    		this.dataSource.filter([					
+				{ field: "type", value: "bill" },
+        		{ field: "status", operator: "where_in", value: [0,2] },
+        		{ field:"deleted", value: 0 }
+			]);
+    	},
+    	loadOpenSO 		: function(){
+    		this.dataSource.filter([					
+				{ field: "type", value: "so" },
+        		{ field: "status", value: 0 },
+        		{ field:"deleted", value: 0 }
+			]);
+    	},
+    	loadOpenInvoice 	: function(){
+    		this.dataSource.filter([					
+				{ field: "type", value: "invoice" },
+        		{ field: "status", operator: "where_in", value: [0,2] },
+        		{ field:"deleted", value: 0 }
+			]);
+    	},
+    	loadMinProduct 	: function(){			
+			banhji.product.dataSource.filter([				
+        		{ field: "status", value: 1 },
+        		{ field: "on_hand <=", value: "order_point" },
+        		{ field:"deleted", value: 0 }
+			]);
+
+			banhji.router.navigate('/products');			
+    	}
+    });    	
     banhji.newProduct =  kendo.observable({    	
-    	dataSource 	: dataStore(baseUrl + "products/index"),
-    	categoryDS 	: dataStore(baseUrl + "categories/index"),    	
-    	unitDS	   	: dataStore(baseUrl + "units/index"),
+    	dataSource 	: dataStore(baseUrl + "products"),
+    	categoryDS 	: dataStore(baseUrl + "categories"),    	
+    	unitDS	   	: dataStore(baseUrl + "units"),
 
     	product 	: null,
     	isEdit 		: false,
@@ -2119,18 +2844,24 @@
 	    }
     });
 	banhji.priceList =  kendo.observable({    	
-    	dataSource 	: dataStore(baseUrl + "price_lists/index"),
-    	productDS 	: dataStore(baseUrl + "products/index"),
-    	stockDS 	: dataStore(baseUrl + "stocks/index"),    	
-    	currencyDS 	: dataStore(baseUrl + "currencies/index"),    	
-    	unitDS	   	: dataStore(baseUrl + "units/index"),
+    	dataSource 	: dataStore(baseUrl + "price_lists"),
+    	productDS 	: dataStore(baseUrl + "products"),
+    	stockDS 	: dataStore(baseUrl + "stocks"),    	
+    	currencyDS 	: dataStore(baseUrl + "currencies"),    	
+    	unitDS	   	: dataStore(baseUrl + "units"),
 
     	product 	: null,
     	priceList 	: null,
     	
     	pageLoad 	: function(id){    		
     		this.dataSource.filter({ field:"product_id", value: id });    		
-    		this.stockDS.filter({ field:"product_id", value: id });    		
+    		this.stockDS.query({
+    			filter: [
+    				{ field:"product_id", value: id },
+    				{ field:"quantity >", value: -1 }
+    			],
+    			sort: { field: "issued_date", dir: "desc" }
+    		});    		
     		this.loadProduct(id);
     	},
     	loadProduct : function(id){
@@ -2165,8 +2896,7 @@
       			price 			: 0,
       			unit_value		: 0,
 
-      			currency 		: [],
-      			product 		: [],
+      			currency 		: [{locale:"km-KH"}],      			
       			unit 			: []
 			});
 
@@ -2177,6 +2907,7 @@
       	},      	 	
       	save 			: function(){
       		this.dataSource.sync();
+      		banhji.product.dataSource.fetch();
 
       		var window = $("#priceList-window").data("kendoWindow");          	         	
           	window.close(); 		
@@ -2199,80 +2930,163 @@
 	    }
     });
 	banhji.product =  kendo.observable({    	
-    	dataSource 	: dataStore(baseUrl + "products/index"),
-    	categoryDS 	: dataStore(baseUrl + "categories/index"),    	
-    	contactDS  	: dataStore(baseUrl + "contacts/index"),
-    	currencyDS 	: dataStore(baseUrl + "currencies/index"),
-    	unitDS 	   	: dataStore(baseUrl + "units/index"),
-    	priceListDS : dataStore(baseUrl + "price_lists/index"),   	
-
+    	dataSource 	: dataStore(baseUrl + "products"),
+    	categoryDS 	: dataStore(baseUrl + "categories"),    	
+    	contactDS  	: dataStore(baseUrl + "contacts"),
+    	vendorDS  	: dataStore(baseUrl + "contacts"),
+    	currencyDS 	: dataStore(baseUrl + "currencies"),
+    	unitDS 	   	: dataStore(baseUrl + "units"),
+    	
     	searchField	: "",
-    	cart 		: [],    	
+    	cart 		: [],
     	priceList 	: [],
+    	countItem 	: 0,
 
+    	unit_id 	: null,
+    	currency_id : null,
+    	product_id 	: null,
+    	description : "",
+    	quantity 	: 1,
+    	price 		: 0,
+    	amount 		: 0,
+    	
     	pageLoad 		: function(){    		
-    		
+    		this.set("countItem", banhji.bill.lineDS.total());
     	},
     	search 			: function(){
-    		this.dataSource.filter({ field:"number", operator:"search", value: this.get("searchField") });
+    		this.dataSource.filter([
+    			{ field:"number", operator:"search", value: this.get("searchField") },
+    			{ field:"deleted", value: 0 }
+    		]);
     	},
     	searchFavorite 	: function(){
-    		this.dataSource.filter({ field:"favorite", value:1 });
+    		this.dataSource.filter([
+    			{ field:"favorite", value:1 },
+    			{ field:"deleted", value: 0 }
+    		]);
     	},
     	categoryChanges : function(e){
     		var index = e.sender.select().index();
     		var data = this.categoryDS.at(index);
 
-    		this.dataSource.filter({ field:"category_id", value:data.id });
+    		this.dataSource.filter([
+    			{ field:"category_id", value:data.id },
+    			{ field:"deleted", value: 0 }
+    		]);
     	},
     	vendorChanges 	: function(e){    		
     		var index = e.sender.select().index();
     		var data = this.contactDS.at(index);
     		
-    		this.dataSource.filter({ field:"vendor", operator:"by_vendor", value:data.id });
+    		this.dataSource.filter([
+    			{ field:"vendor", operator:"by_vendor", value:data.id },
+    			{ field:"deleted", value: 0 }
+    		]);
     	},
     	addToCart 		: function(){
-    		this.dataSource.add(this.get("cart"));
-    	},
-    	priceChanges 	: function(e){    		
-    		var index = kendo.parseInt(e.sender.selectedIndex);
-    		var pl = this.priceListDS.at(index);
-    		
-    		this.cart[0].price = pl.price;    		
-    	},
-    	openWindow		: function(e){
-      		var data = e.data;
+    		var self = this,
+    		isExist = false;
 
-      		this.priceListDS.filter({ field:"product_id", value: data.id });
+    		if(banhji.bill.lineDS.total>0){
+	    		$.each(banhji.bill.lineDS.data(), function(index, value){
+	    			if(value.product_id==self.get("product_id")){
+	    				isExist = true;
+	    				var newQty = value.quantity + self.get("quantity");	      			
+		      			value.set("quantity", newQty);	      				      		
+	    			}
+	    		});
+    		}
+
+    		if(isExist==false){
+    			var bill_id = 0;
+				if(banhji.bill.get("isEdit")){
+					bill_id = banhji.bill.get("bill").id;
+				}
+	    		banhji.bill.lineDS.add({
+	      			bill_id 		: bill_id,
+	      			unit_id 		: this.get("unit_id"),      			
+	      			currency_id 	: this.get("currency_id"),
+	      			product_id 		: this.get("product_id"),
+	      			description		: this.get("description"),
+	      			quantity		: this.get("quantity"),
+	      			price 			: this.get("price"),
+	      			amount 			: this.get("amount"),
+	      			rate 			: 1,
+
+	      			priceList 		: this.get("priceList")
+	      		});
+    		}
+
+      		this.set("countItem", banhji.bill.lineDS.total());
+
+      		this.closeWindow();
+    	},    	
+    	priceChanges 	: function(e){
+    		var index = e.sender.selectedIndex;    		    		
+
+    		this.set("price", this.priceList[index].price);
+    		this.onChange();
+    	},
+    	currencyChanges : function(e){
+    		var index = e.sender.selectedIndex;
+    		var obj = this.currencyDS.at(index);    		    		
+    		var amount = kendo.parseFloat(this.get("amount"));
+
+    		this.set("currency_id", obj.id);
+    		
+    		if(this.get("currency_id")==2){
+				this.set("amount", kendo.toString(amount, "c0", "km-KH"));
+    		}else{
+    			this.set("amount", kendo.toString(amount, "c"));
+    		}     		
+    	},
+    	onChange 		: function(){    		
+    		var amount = this.get("quantity") * this.get("price");
+
+    		if(this.get("currency_id")==2){
+				this.set("amount", kendo.toString(amount, "c0", "km-KH"));
+    		}else{
+    			this.set("amount", kendo.toString(amount, "c"));
+    		}    		
+    	},    	    	
+    	openWindow		: function(e){
+      		var data = e.data,
+      		self = this;      		
       		
-      		this.set("cart", []);
-      		this.cart.push({
-      			bill_id 		: 0,
-      			unit_id 		: data.price_lists[0].unit_id,      			
-      			currency_id 	: 1,
-      			product_id 		: data.id,
-      			description		: data.name +" "+ data.description,
-      			quantity		: 1,
-      			price 			: data.price_lists[0].price,
-      			amount 		 	: data.price_lists[0].price
+      		this.set("priceList", []);
+      		$.each(data.price_lists, function(index, value){
+      			self.priceList.push(value);      			
       		});
+
+      		this.set("unit_id", data.price_lists[0].unit_id);
+	    	this.set("currency_id", data.price_lists[0].currency_id);
+	    	this.set("product_id", data.id);
+	    	this.set("description", data.name +" "+ data.description);
+	    	this.set("quantity", 1);
+	    	this.set("price", data.price_lists[0].price);
+
+	    	if(data.price_lists[0].currency_id==2){
+	    		this.set("amount", kendo.toString(data.price_lists[0].price, "c0", "km-KH"));
+	    	}else{
+	    		this.set("amount", kendo.toString(data.price_lists[0].price, "c"));
+	    	}
+
+	    	this.set("priceList", data.price_lists);
 
          	var window = $("#cart-window").data("kendoWindow");
           	window.title("រទេះទំនិញ");          	
           	window.center().open();         	
       	},
-      	closeWindow : function(){	      		
-      		this.set("cart", []);
-
+      	closeWindow 	: function(){
       		var window = $("#cart-window").data("kendoWindow");          	         	
           	window.close();          	
-      	},
+      	}
     });
     banhji.newStock =  kendo.observable({    	
-    	dataSource 	: dataStore(baseUrl + "stocks/index"),    	
-    	currencyDS 	: dataStore(baseUrl + "currencies/index"),
-    	contactDS  	: dataStore(baseUrl + "contacts/index"),
-    	unitDS 	   	: dataStore(baseUrl + "units/index"),
+    	dataSource 	: dataStore(baseUrl + "stocks"),    	
+    	currencyDS 	: dataStore(baseUrl + "currencies"),
+    	contactDS  	: dataStore(baseUrl + "contacts"),
+    	unitDS 	   	: dataStore(baseUrl + "units"),
 
     	searchField	: "",
     	stock 		: null,
@@ -2281,24 +3095,30 @@
 
     	pageLoad 		: function(id){
     		this.set("product_id", id);    		    		
-    		this.contactDS.filter({ field:"contact_type_id", value: 2 });
+    		this.contactDS.filter([
+    			{ field:"contact_type_id", value: 2 },
+    			{ field:"deleted", value: 0 }
+    		]);
     		this.addEmpty();
     	},    	
       	addEmpty 		: function(){
-      		this.dataSource.add({      			
-      			currency_id 	: 1,
-      			contact_id 		: 0,
-      			product_id 		: this.get("product_id"),
-      			unit_id 		: 0,
-      			quantity		: 0,
-      			price 			: 0,
-      			issued_date		: new Date()
-			});
+      		if(this.dataSource.total()==0){
+	      		this.dataSource.add({      			
+	      			currency_id 	: 1,
+	      			reference_id 	: 0,
+	      			contact_id 		: 0,
+	      			product_id 		: this.get("product_id"),
+	      			unit_id 		: 0,
+	      			quantity		: 0,
+	      			price 			: 0,
+	      			issued_date		: new Date()
+				});
 
-			var data = this.dataSource.data();
-			var obj = data[data.length - 1];
-      						
-			this.set("stock", obj);
+				var data = this.dataSource.data();
+				var obj = data[data.length - 1];
+	      						
+				this.set("stock", obj);
+      		}			
       	},
       	edit 			: function(e){
       		var data = e.data;
@@ -2328,136 +3148,666 @@
 	    }
     });
     banhji.bill =  kendo.observable({    	    	
-    	dataSource 	: dataStore(baseUrl + "bills/index"),
-    	lineDS 	 	: dataStore(baseUrl + "bills/line"),    	
-    	currencyDS 	: dataStore(baseUrl + "currencies/index"),
-    	contactDS  	: dataStore(baseUrl + "contacts/index"),    	
-    	unitDS 	   	: dataStore(baseUrl + "units/index"),
+    	dataSource 		: dataStore(baseUrl + "bills"),
+    	lineDS 	 		: dataStore(baseUrl + "bills/line"),    	
+    	currencyDS 		: dataStore(baseUrl + "currencies"),
+    	contactDS  		: dataStore(baseUrl + "contacts"),
+    	contactSearchDS : dataStore(baseUrl + "contacts"),    		   	   	
+    	unitDS 		 	: dataStore(baseUrl + "units"),    	
+    	stockDS 		: dataStore(baseUrl + "stocks"),
+    	    	
+    	bill 			: null,
+    	contact 		: null,    	
+    	phone 			: "",
+    	name 			: "",
+    	isEdit 			: false,
+    	unitList 		: [],
+    	currencyList 	: [],
+    	typeList 		: [
+    		{ id:"invoice", name:"វិក្កយបត្រ" },
+    		{ id:"receipt", name:"បង្កាន់ដៃលក់" },
+    		{ id:"so", name:"បញ្ជាលក់" },
+    		{ id:"bill", name:"វិក្កយបត្រទិញ" },
+    		{ id:"po", name:"បញ្ជាទិញ" },
+    		{ id:"expense", name:"ចំណាយ" },
+    		{ id:"income", name:"ចំណូល" },
+    		{ id:"invest", name:"វិនិយោគ" },
+    		{ id:"witdraw", name:"ដកប្រាក់" },
+    		{ id:"salary", name:"ប្រាក់ខែ" }
+    	],
     	
-    	bill 		: null,
-    	contact 	: null,
-
+    	sub_total 		: 0,
+    	amount_khr 		: 0,
+    	changes_khr		: 0,    	
+    	
     	pageLoad 		: function(id){
+    		var self = this,
+    		isRefreshed = false;
+
+    		this.setData();
+    		
+    		if(id){
+    			this.set("isEdit", true);
+	    		this.loadBill(id);  			
+    		}else{
+    			//Refresh grid
+	    		if(this.lineDS.total()>0 && isRefreshed==false){
+			 		var childGrid = $(".k-grid").data("kendoGrid");
+	    			childGrid.refresh();
+			 	}
+
+			 	this.setEmpty();
+			 	this.setEmptyContact();			 			 	
+			 	this.onChange();			 				 			 			 			   			
+    		}
+    	},
+    	loadBill 		: function(id){
+    		var self = this;
+    		this.set("bill_id", id);
+
+    		this.dataSource.query({    			
+				filter: { field:"id", value: id }
+			}).then(function(e){
+				var view = self.dataSource.view();
+		    	self.set("bill", view[0]);
+
+		    	self.loadContact(view[0].contact_id);		    		    			    	
+			});												
+			
+			this.lineDS.query({
+				filter: { field:"bill_id", value: id }
+			}).then(function(e){
+				var amount = 0,
+	      		total = 0,
+	      		totalPaid = 0,
+	      		totalChanges = 0,
+	      		bill = self.get("bill");
+
+				$.each(self.lineDS.view(), function(index, value){
+					value.amount = value.quantity * value.price;
+
+	      			if(value.currency_id==2){
+	      				amount += kendo.parseFloat(value.amount) / kendo.parseFloat(bill.rate);
+	      			}else{
+	      				amount += kendo.parseFloat(value.amount);
+	      			}
+				});
+
+				total = (amount + bill.fine) - bill.discount;      		
+
+	      		self.set("sub_total", amount, "c");	      		
+	      		self.set("amount_khr", total*bill.rate);
+	      		
+	      		if(bill.paid_usd>0 || bill.paid_khr>0){
+		      		totalPaid = bill.paid_usd + (bill.paid_khr/bill.rate);
+		      		totalChanges = totalPaid - total;
+		      		
+		      		self.set("changes_khr", totalChanges*bill.rate);
+	      		}else{	      			
+		      		self.set("changes_khr", 0);
+	      		}
+
+	      		self.autoIncreaseNo();	    		    			    	
+			});
+
+			this.stockDS.filter({ field:"reference_id", value: id });
+    	},
+    	loadContact		: function(id){
+    		var self = this,
+    		bill = this.get("bill");
+    		
+	    	this.contactDS.query({			    		    			
+				filter: { field:"id", value: id }
+			}).then(function(e){
+				var view = self.contactDS.view();
+					    	
+	    		self.set("contact", view[0]);
+	    		bill.set("address", view[0].address);	    		
+			});					
+    	},    	
+    	setData 		: function(){
     		var self = this;
 
-    		if(id){
-	    		this.dataSource.query({    			
-					filter: { field:"id", value: id }
+    		if(this.unitDS.total()==0){
+	    		this.unitDS.query({    			
+					page: 1,
+					limit: 100
 				}).then(function(e){
-					var view = self.dataSource.view();
-			    	self.set("bill", view[0]);
+					$.each(self.unitDS.view(), function(index, value){
+						self.unitList.push({
+							unit_id : value.id,
+							unit 	: value.name,
+							price   : 0
+						});
+					});	    		    			    	
+				});
+			}
 
-			    	self.contactDS.query({			    		    			
-						filter: { field:"id", value: view[0].contact_id }
-					}).then(function(e){
-						var viewC = self.contactDS.view();
-							    	
-			    		self.set("contact", viewC[0]);
-					});			    			    	
-				});												
-    			
-    			this.lineDS.filter({ field:"bill_id", value: id });
-    		}else{
-    			if(this.dataSource.total()==0){
-    			 	this.addEmpty();
-    			 	this.addEmptyCustomer();
-    			}    			
-    		}
+			if(this.currencyDS.total()==0){
+				this.currencyDS.query({    			
+					page: 1,
+					limit: 100
+				}).then(function(e){
+					var viewC = self.currencyDS.view();
+			    	self.set("currencyList", viewC);		    		    			    	
+				});
+			}
     	},    	
-      	addEmpty 		: function(){
-      		this.dataSource.add({      			
-      			contact_id 		: 0,
-      			biller_id 		: 0,      			
-      			currency_id 	: 1,
-      			reference_id 	: 0,
-      			type 			: "invoice",
-      			number 			: "",
-      			amount 		 	: 0,
-      			memo 			: "",      			
-      			issued_date		: new Date(),
-      			due_date 		: new Date()
-			});
+      	setEmpty 		: function(){
+      		if(this.get("isEdit")==false){      		
+	      		var self = this, hasNew = false;
 
-			var data = this.dataSource.data();
-			var obj = data[data.length - 1];
-      						
-			this.set("bill", obj);
-      	},
-      	addEmptyCustomer 		: function(){
-      		this.contactDS.add({      			
-      			currency_id		: 0,
-      			user_id 		: 0,      			
-      			contact_type_id	: 1,      			
-      			number 			: "",
-      			surname 		: "",
-      			name 			: "",
-      			gender 			: "M",
-      			dob 			: "",
-      			pob 			: "",
-      			address 		: "",
-      			family_member 	: "",
-      			id_number 		: "",
-      			phone 			: "",
-      			email 			: "",
-      			job 			: "",
-      			company 		: "",
-      			image_url 		: "",      			
-      			memo 			: "",
-      			credit_limit 	: 0,
-      			registered_date : new Date(),      			
-      			status 			: 1,
-			});
+	      		if(this.dataSource.total()>0){
+	      			$.each(this.dataSource.data(), function(index, value){
+	      				if(value.id==""){
+	      					hasNew = true;
+	      					self.set("bill", value);
 
-			var data = this.dataSource.data();
-			var obj = data[data.length - 1];
-      						
-			this.set("contact", obj);
+	      					return false;
+	      				}
+	      			});
+	      		}
+
+	  			if(hasNew==false){      			
+		      		this.dataSource.add({      			
+		      			contact_id 		: 0,
+		      			biller_id 		: 0,      			
+		      			currency_id 	: 1,
+		      			reference_id 	: 0,
+		      			type 			: "invoice",
+		      			number 			: "",
+		      			amount 		 	: 0,	      			
+		      			paid 			: 0,
+		      			paid_usd 		: 0,
+		      			paid_khr 		: 0,
+		      			changes 		: 0,	      			
+		      			discount 		: 0,
+		      			fine 			: 0,
+		      			rate 			: 4100,
+		      			memo 			: "",
+		      			address 		: "",
+		      			status 			: "",      			
+		      			issued_date		: new Date(),
+		      			due_date 		: new Date(),
+		      			paid_date 		: ""	      			
+					});
+
+					var data = this.dataSource.data(),
+					obj = data[data.length - 1];
+		      						
+					this.set("bill", obj);
+				}
+			}
       	},
+      	setEmptyContact : function(){
+      		if(this.contactDS.total()>0){
+      			var contact = this.contactDS.data();
+      			this.set("contact", contact[0]);
+      		}else{
+	      		this.contactDS.add({      			
+	      			currency_id		: 2,
+	      			user_id 		: 0,      			
+	      			contact_type_id	: 1,      			
+	      			number 			: "",
+	      			surname 		: "",
+	      			name 			: "",
+	      			gender 			: "M",
+	      			dob 			: "",
+	      			pob 			: "",
+	      			address 		: "",
+	      			family_member 	: "",
+	      			id_number 		: "",
+	      			phone 			: "",
+	      			email 			: "",
+	      			job 			: "",
+	      			company 		: "",
+	      			image_url 		: "",      			
+	      			memo 			: "",
+	      			credit_limit 	: 0,
+	      			registered_date : new Date(),      			
+	      			status 			: 1,
+				});					
+
+				var data = this.contactDS.data(),
+				obj = data[data.length - 1];
+	      						
+				this.set("contact", obj);
+			}			
+      	},      	
       	phoneSearch 	: function(){
       		var self = this;
 
-      		this.contactDS.query({
-      			filter: { field:"phone", value:this.get("contact").phone }
+      		this.contactSearchDS.query({
+      			filter: { field:"phone", operator:"contains", value:this.get("phone") }
       		}).then(function(e){
-      			var view = self.contactDS.view();
-			    self.set("contact", view[0]);
+      			var view = self.contactSearchDS.view();
+
+      			if(self.contactSearchDS.total()>0){      			
+			    	self.loadContact(view[0].id);
+			    }else{			    	
+			    	self.setEmptyContact();
+
+			    	var contact = self.get("contact"),
+			    	bill = self.get("bill");
+			    	contact.set("phone", self.get("phone"));
+			    	bill.set("address", "");
+			    }
       		});
+      	},
+      	removeSearch 	: function(){
+      		var bill = this.get("bill");
+      		bill.set("address", "");
+      		this.set("name", "");
+      		this.contactSearchDS.filter({ field:"id >", value: 0 });      		      		
+      		this.setEmptyContact();
       	},      	
-      	edit 			: function(e){
-      		var data = e.data;
-      		
-      		this.set("stock", data);      		    		
+      	autoIncreaseNo 	: function(){
+			$(".sno").each(function(index,element){                 
+			   $(element).text(index + 1); 
+			});
+		},
+      	addRow 			: function(){
+      		var bill_id = 0;
+			if(this.get("isEdit")){
+				bill_id = this.get("bill").id;
+			}
 
-      		var window = $("#stock-window").data("kendoWindow");
-          	window.title("ស្តុក");          	
-          	window.center().open();
+      		this.lineDS.add({
+      			bill_id 		: bill_id,
+      			unit_id 		: 0,      			
+      			currency_id 	: 1,
+      			product_id 		: 0,
+      			description		: "",
+      			quantity		: 1,
+      			price 			: 0,
+      			amount 			: 0,
+      			rate 			: 1,
+
+      			priceList 		: this.get("unitList")
+      		});
+
+      		this.autoIncreaseNo();      		
       	},
-      	change 			: function(){
+      	removeRow 		: function(e){						
+			var d = e.data, self = this;
 
+			this.lineDS.remove(d);
+	        this.onChange();
+
+	        //Delete stock too
+	        if(this.get("isEdit")){
+	        	$.each(this.stockDS.data(), function(index, value){
+	        		if(value.product_id==d.product_id){
+	        			self.stockDS.remove(value);
+
+	        			return false;
+	        		}
+	        	});
+	        }		        
+		},      	
+      	onChange 		: function(){
+      		if(this.lineDS.total()>0){
+	      		var amount = 0,
+	      		total = 0,
+	      		totalPaid = 0,
+	      		totalChanges = 0,
+	      		bill = this.get("bill");
+
+	      		$.each(this.lineDS.data(), function(index, value){
+	      			value.amount = value.quantity * value.price;
+
+	      			if(value.currency_id==2){
+	      				amount += kendo.parseFloat(value.amount) / kendo.parseFloat(bill.rate);
+	      			}else{
+	      				amount += kendo.parseFloat(value.amount);
+	      			}      			
+	      		});
+
+	      		total = (amount + bill.fine) - bill.discount;      		
+
+	      		this.set("sub_total", amount, "c");
+	      		bill.set("amount", total);
+	      		this.set("amount_khr", total*bill.rate);
+	      		
+	      		if(bill.paid_usd>0 || bill.paid_khr>0){
+		      		totalPaid = bill.paid_usd + (bill.paid_khr/bill.rate);
+		      		totalChanges = totalPaid - total;
+
+		      		if(totalChanges>=0){
+		      			bill.set("status", 1);
+		      			bill.set("paid_date", bill.issued_date);
+		      		}else{
+		      			bill.set("status", 0);
+		      			bill.set("paid_date", "");
+		      		}
+
+		      		bill.set("paid", totalPaid);
+		      		bill.set("changes", totalChanges);
+		      		this.set("changes_khr", totalChanges*bill.rate);
+	      		}else{
+	      			bill.set("status", 0);
+		      		bill.set("paid_date", "");
+
+	      			bill.set("paid", 0);
+	      			bill.set("changes", 0);
+		      		this.set("changes_khr", 0);
+	      		}
+
+	      		this.autoIncreaseNo();
+	      	}
       	},
-      	cancelChanges 	: function(e){
-      		e.preventDefault();
+      	unitChanges 	: function(e){
+      		var d = e.data,
+      		index = e.sender.selectedIndex;
 
+      		if(index>0){
+      			d.set("price", d.priceList[index-1].price);
+      			d.set("currency_id", d.priceList[index-1].currency_id);
+      		}else{
+      			d.set("price", 0);
+      		}
+
+      		this.onChange();
+      	},
+      	getRate 		: function(from_currency_id, to_currency_id){
+    		var rate = 1, self = this;
+
+    		if(this.currencyDS.total()>0){
+    			if(from_currency_id!==to_currency_id){    					
+					var from_currency = this.currencyDS.get(from_currency_id),
+					to_currency = this.currencyDS.get(to_currency_id);
+				
+		        	var from_rate = kendo.parseFloat(from_currency.rate),
+		        	to_rate = kendo.parseFloat(to_currency.rate);
+		        	
+		        	if(from_rate>0 && to_rate>0){
+		        		rate = to_rate/from_rate;
+		        	}	
+		        }
+
+		        return rate;
+		    }else{
+		    	this.currencyDS.query({
+	      			page: 1,
+	      			limit: 100	      			
+	      		}).then(function(e){
+	      			var view = self.currencyDS.view();	      			
+
+					if(from_currency_id!==to_currency_id){
+						var from_currency = self.currencyDS.get(from_currency_id),
+						to_currency = self.currencyDS.get(to_currency_id);
+
+			        	var from_rate = kendo.parseFloat(from_currency.rate),
+			        	to_rate = kendo.parseFloat(to_currency.rate);
+			        	
+			        	if(from_rate>0 && to_rate>0){
+			        		rate = from_rate/to_rate;
+			        	}	
+			        }
+
+			        return rate;
+	      		});	      		
+	    	}	        		    
+		},
+      	cancelChanges 	: function(){
       		this.dataSource.cancelChanges();
+      		this.lineDS.cancelChanges();
+      		this.contactDS.cancelChanges();      		
+
+      		if(this.get("isEdit")){
+      			this.stockDS.cancelChanges();
+      		}      		
+
+      		this.clear();      				
+
       		window.history.back();      		
+      	},
+      	clear		 	: function(){
+      		this.dataSource.data([]);      		
+      		this.lineDS.data([]);
+      		this.contactDS.data([]);
+      		
+      		this.set("phone", "");
+      		this.set("name", "");
+      		this.set("sub_total", 0);
+      		this.set("amount_khr", 0);
+      		this.set("changes_khr", 0);
+
+      		this.set("isEdit", false);
+
+      		this.pageLoad();
+      		banhji.product.dataSource.fetch();      		  		
       	}, 
       	save 			: function(){
+      		var self = this,
+      		newContact = this.contactDS.data(),
+      		contact = this.get("contact"),
+      		bill = this.get("bill");      		
+      		
+      		if(this.get("isEdit")){ //Update Bill
+      			this.update();	
+      		}else{
+      			if(contact.id>0){ //New Bill With Existing Customer      				
+      				bill.set("contact_id", contact.id);
+      				this.contactDS.sync();
+
+	      			//Bill
+	      			this.dataSourceSync()
+	      			.then(function(data){
+	      				//Stock
+		      			self.stockSync(data.data[0].id);
+
+	      				//Line
+	      				$.each(self.lineDS.data(), function(index, value){
+	      					value.set("bill_id", data.data[0].id);
+	      				});
+	      				self.lineDS.sync();
+	      				self.lineDS.bind("requestEnd", function(e){
+	      					self.clear();
+	      				});
+	      			});	
+      			}else{
+      				//New Bill With General Customer, id always = 1
+		      		if(contact.phone==="" && contact.name===""){		      		     			
+		      			bill.set("contact_id", 1);
+		      			
+		      			//Bill		      			
+		      			this.dataSourceSync()
+		      			.then(function(data){
+		      				//Stock
+		      				self.stockSync(data.data[0].id);
+
+		      				//Line
+		      				$.each(self.lineDS.data(), function(index, value){
+		      					value.set("bill_id", data.data[0].id);
+		      				});	      				
+
+		      				self.lineDS.sync();
+		      				self.lineDS.bind("requestEnd", function(e){
+								self.clear();
+							});	      				
+		      			});		      		
+		      		}else{ //New Bill With New Customer		      			
+		      			newContact[0].set("address", bill.address);
+
+		      			//Contact
+		      			this.contactSync()
+			      		.then(function(data){
+			      			bill.set("contact_id", data.data[0].id);
+
+			      			//Bill
+			      			self.dataSourceSync()
+			      			.then(function(billData){
+			      				//Stock
+			      				self.stockSync(billData.data[0].id);
+
+			      				//Line
+			      				$.each(self.lineDS.data(), function(index, value){
+			      					value.set("bill_id", billData.data[0].id);
+			      				});	      				
+
+			      				self.lineDS.sync();
+			      				self.lineDS.bind("requestEnd", function(e){
+									self.clear();
+								});	      				
+			      			});
+			      		});
+		      		}	
+      			}      			
+      		}      		
+      	},
+      	update 			: function(){
+      		var bill = this.get("bill"),
+      		contact = this.get("contact");
+
+      		if(bill.contact_id!==contact.id){
+      			bill.set("contact_id", contact.id);
+      		}
+      		this.updateStock();
+
       		this.dataSource.sync();
-      		window.history.back();
-      	},      	
-      	delete 			: function(e){
-			if (confirm("តើលោកអ្នកពិតជាចង់លុបមែនឬទេ?")) {        
-		        var data = e.data;
-		        this.dataSource.remove(data);
-		        this.dataSource.sync();
+  			this.lineDS.sync();
+  			this.contactDS.sync();
+
+  			this.set("isEdit", false);  			
+  			banhji.router.navigate('/sale_center');  			
+      	},
+      	delete 			: function(){
+			if (confirm("តើលោកអ្នកពិតជាចង់លុបមែនឬទេ?")) {
+				var bill = this.get("bill");
+				bill.set("deleted", 1);								
+
+				for (var i=0; i<this.stockDS.total(); i++) {
+					var s = this.stockDS.at(i);
+					s.set("deleted", 1);
+				}		        
+		        
+		        this.dataSource.sync();		       
+		        this.stockDS.sync();
+
+		        this.set("isEdit", false);
+		        banhji.router.navigate('/sale_center');
 	    	}	    	
-	    }
+	    },	    
+      	updateStock		: function(){
+      		var self = this,
+      		isOut = -1,     		
+      		bill = this.get("bill");
+      		
+  			if(bill.type=="bill"){
+  				isOut = 1;
+  			}
+
+      		//Stock	      		
+      		$.each(this.lineDS.data(), function(index, value){
+      			if(value.product_id>0){
+					if(value.id===""){
+						self.stockDS.add({      			
+			      			currency_id 	: value.currency_id,
+			      			reference_id	: bill.id,
+			      			contact_id 		: 0,
+			      			product_id 		: value.product_id,
+			      			unit_id 		: value.unit_id,
+			      			quantity		: value.quantity * isOut,
+			      			price 			: value.price,
+			      			issued_date		: bill.issued_date,
+
+			      			priceList 		: value.priceList
+						});
+					}else{
+						self.setStock(value.id, value.product_id);
+					}
+				}			
+			});			
+
+			this.stockDS.sync();
+			this.stockDS.bind("requestEnd", function(e){
+				self.stockDS.data([]);
+			});						
+      	},
+      	setStock 		: function(line_id, product_id){
+      		var l = this.lineDS.get(line_id);
+
+      		$.each(this.stockDS.data(), function(index, value){
+      			if(value.product_id==product_id){
+	      			value.set("currency_id", l.currency_id);
+	      			value.set("unit_id", l.unit_id);
+	      			value.set("quantity", l.quantity);
+	      			value.set("price", l.price);
+
+	      			return false;
+      			}
+      		});
+      	},
+      	stockSync 		: function(bill_id){
+      		var self = this,
+      		isOut = -1,     		
+      		bill = this.get("bill");
+      		
+  			if(bill.type=="bill"){
+  				isOut = 1;
+  			}
+
+      		//Stock	      		
+      		$.each(this.lineDS.data(), function(index, value){
+      			if(value.product_id>0){
+					self.stockDS.add({      			
+		      			currency_id 	: value.currency_id,
+		      			reference_id	: bill_id,
+		      			contact_id 		: 0,
+		      			product_id 		: value.product_id,
+		      			unit_id 		: value.unit_id,
+		      			quantity		: value.quantity * isOut,
+		      			price 			: value.price,
+		      			issued_date		: bill.issued_date,
+
+		      			priceList 		: value.priceList
+					});
+				}				
+			});			
+
+			this.stockDS.sync();
+			this.stockDS.bind("requestEnd", function(e){
+				self.stockDS.data([]);
+			});						
+      	},      	
+	    dataSourceSync 	: function() {
+			var dfd = $.Deferred();
+			this.dataSource.sync();
+			this.dataSource.bind("requestEnd", function(e){
+				if(e.response.results) {
+					dfd.resolve({type: e.type, data: e.response.results});
+				} else {
+					dfd.reject({error: e.type + ' can not process.'});
+				}
+			});
+			return dfd.promise();
+		},
+		contactSync 	: function() {
+			var dfd = $.Deferred();
+			this.contactDS.sync();
+			this.contactDS.bind("requestEnd", function(e){
+				if(e.response.results) {
+					dfd.resolve({type: e.type, data: e.response.results});
+				} else {
+					dfd.reject({error: e.type + ' can not process.'});
+				}
+			});
+			return dfd.promise();
+		},
+		print 			: function(){
+			banhji.router.navigate('/invoice_print/' + this.get("bill").id);
+		}
     });
     banhji.invoicePrint =  kendo.observable({    	
-    	dataSource 	: dataStore(baseUrl + "bills/index"),
+    	dataSource 	: dataStore(baseUrl + "bills"),
     	lineDS 		: dataStore(baseUrl + "bills/line"),
     	
-    	bill 		: null,    	  	
+    	bill 		: null,
+    	invoiceType : "Invoice",
+    	invoiceTypeKH : "វិក្កយបត្រ",
+    	total_usd 	: 0,
+    	total_khr 	: 0,    	  	
 
     	pageLoad 	: function(id){
     		var self = this;
@@ -2466,19 +3816,82 @@
 				filter: { field:"id", value: id }
 			}).then(function(e){
 				var view = self.dataSource.view();
-						    	
-		    	self.set("bill", view[0]);
+				
+				self.setTitle(view[0].type);
+		    	self.set("bill", view[0]);		    	
+		    	self.set("total_usd", kendo.toString(view[0].amount, "c"));
+		    	self.set("total_khr", kendo.toString(view[0].amount*view[0].rate, "c0", "km-KH"));		    	
 			});
 
-    		this.lineDS.filter({ field:"bill_id", value: id });
-    	}    	
-    });	
+			this.lineDS.query({
+				filter: { field:"bill_id", value: id }
+			}).then(function(e){
+				self.autoIncreaseNo();		    	
+			});    		
+    	},
+    	setTitle 		: function(type){    		
+    		switch(type) {
+			    case "receipt":
+			    	this.set("invoiceType", "Receipt");
+			        this.set("invoiceTypeKH", "បង្កាន់ដៃលក់");
+			        break;
+			    case "so":
+			    	this.set("invoiceType", "Sale Order");
+			        this.set("invoiceTypeKH", "បញ្ជាលក់");
+			        break;
+			    case "bill":
+			    	this.set("invoiceType", "Bill");
+			        this.set("invoiceTypeKH", "វិក្កយបត្រទិញ");
+			        break;
+			    case "po":
+			    	this.set("invoiceType", "Purchase Order");
+			        this.set("invoiceTypeKH", "បញ្ជាទិញ");
+			        break;
+			    case "expense":
+			    	this.set("invoiceType", "Expense");
+			        this.set("invoiceTypeKH", "ចំណាយ");
+			        break;
+			    case "income":
+			    	this.set("invoiceType", "Income");
+			        this.set("invoiceTypeKH", "ចំណូល");
+			        break;
+			    default:
+			    	this.set("invoiceType", "Invoice");
+			        this.set("invoiceTypeKH", "វិក្កយបត្រ");
+			}
+    	},
+    	autoIncreaseNo 	: function(){
+			$(".sno").each(function(index,element){                 
+				$(element).text(index + 1); 
+			});
+		}    	
+    });
+    banhji.saleSummary =  kendo.observable({    	
+    	dataSource 	: dataStore(baseUrl + "bills/sale_summary"),
+    	
+    	obj 		: null,    	  	
+
+    	pageLoad 	: function(){
+    		
+    	},
+    	loadData 	: function(para){
+    		var self = this;
+
+    		this.dataSource.query({
+				filter: para
+			}).then(function(e){
+				var view = self.dataSource.view();				
+				
+		    	self.set("obj", view[0]);		    	    	
+			});
+    	}  	
+    });    	
 
 	<!-- //views and layout -->
 	banhji.view = {
 		layout 		: new kendo.Layout('#layout', {model: banhji.Layout}),
 		blank		: new kendo.View('<div></div>'),
-		menu 		: new kendo.Layout('#menu-tmpl', {model: banhji.Layout}),
+		menu 		: new kendo.View('#menu-tmpl'),
 		loginV 		: new kendo.View("#login-tmpl", {model: auth}),
 		index  		: new kendo.Layout("#index"),
 		myTmpl 		: new kendo.Layout('#my-tmpl'),
@@ -2489,12 +3902,17 @@
 		adTmpl 		: new kendo.Layout('#admin-tmpl'),	
 		
 		rInvoicePrint: new kendo.View("#rInvoicePrint", {model: banhji.rInvoicePrint}),
+		contact: new kendo.View("#contact", {model: banhji.contact}),
+		contactCenter: new kendo.View("#contactCenter", {model: banhji.contactCenter}),
+
 		newProduct: new kendo.View("#newProduct", {model: banhji.newProduct}),
 		priceList: new kendo.View("#priceList", {model: banhji.priceList}),
 		product: new kendo.View("#product", {model: banhji.product}),
 		newStock: new kendo.View("#newStock", {model: banhji.newStock}),
 		bill: new kendo.View("#bill", {model: banhji.bill}),
-		invoicePrint: new kendo.View("#invoicePrint", {model: banhji.invoicePrint})		
+		invoicePrint: new kendo.View("#invoicePrint", {model: banhji.invoicePrint}),
+		saleCenter: new kendo.View("#saleCenter", {model: banhji.saleCenter}),
+		saleSummary: new kendo.View("#saleSummary", {model: banhji.saleSummary})		
 	};
 
 	<!-- //views and layout-->
@@ -2516,9 +3934,59 @@
 
 	/* Login page */
 	banhji.router.route('/', function(){
+		banhji.view.layout.showIn('#menu', banhji.view.menu);
 		banhji.view.layout.showIn('#content', banhji.view.index);
 	});
 
+	banhji.router.route("/contact_center", function(id){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			var vm = banhji.contactCenter;
+			
+			banhji.view.layout.showIn("#content", banhji.view.contactCenter);				
+			
+			if(banhji.pageLoaded["contact_center"]==undefined){
+				banhji.pageLoaded["contact_center"] = true;
+
+				
+			}	
+		}
+	});
+	banhji.router.route("/contact(/:id)", function(id){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			var vm = banhji.contact;
+			
+			banhji.view.layout.showIn("#content", banhji.view.contact);
+
+			vm.pageLoad(id);			
+			
+			if(banhji.pageLoaded["contact"]==undefined){
+				banhji.pageLoaded["contact"] = true;
+
+				var validator = $("#example").kendoValidator().data("kendoValidator");
+				var notification = $("#notification").kendoNotification({				    
+				    autoHideAfter: 5000,
+				    width: 300,				    
+				    height: 50
+				}).data('kendoNotification');
+
+		        $("#save").click(function(e){				
+					e.preventDefault();
+
+					if(validator.validate()){
+		            	vm.save();
+
+		            	notification.success("កត់ត្រាបានសំរេច");			  
+			        }else{
+			        	notification.error("សូមត្រួតពិនិត្រឪ្យបានត្រឹមត្រូវម្ដងទៀត");			           
+			        }		            
+				});
+			}	
+		}
+	});
 	banhji.router.route("/new_product(/:id)", function(id){
 		if(!auth.getLogin()){
 			banhji.router.navigate('/login');
@@ -2576,12 +4044,14 @@
 		}else{
 			var vm = banhji.product;
 			
-			banhji.view.layout.showIn("#content", banhji.view.product);			
+			banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
+			banhji.view.layout.showIn("#content", banhji.view.product);
+			vm.pageLoad();			
 			
 			if(banhji.pageLoaded["products"]==undefined){
 				banhji.pageLoaded["products"] = true;
 
-				vm.contactDS.filter({ field:"contact_type_id", value: 2 });
+				vm.vendorDS.filter({ field:"contact_type_id", value: 5 });
 			}	
 		}
 	});
@@ -2628,7 +4098,26 @@
 			vm.pageLoad(id);
 
 			if(banhji.pageLoaded["bills"]==undefined){
-				banhji.pageLoaded["bills"] = true;
+				banhji.pageLoaded["bills"] = true;				
+
+				$("#ddlCustomer").kendoComboBox({
+                    placeholder: "ឈ្មោះ...",
+                    dataTextField: "fullIdName",
+                    dataValueField: "id",
+                    filter: "search",
+                    autoBind: false,
+                    minLength: 3,
+                    dataSource: vm.contactSearchDS,
+                    change: function(e) {
+					    var value = this.value();
+
+					    if(value!==""){
+					    	vm.loadContact(value);
+						}else{							
+							vm.removeSearch();
+						}
+					}
+                });
 
 				var validator = $("#example").kendoValidator().data("kendoValidator");
 				var notification = $("#notification").kendoNotification({				    
@@ -2669,6 +4158,251 @@
 			kendo.fx($("#slide-form")).slideIn("down").play();			
 		}
 	});
+	banhji.router.route("/sale_center", function(){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			var vm = banhji.saleCenter;
+			banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
+			banhji.view.layout.showIn("#content", banhji.view.saleCenter);
+
+			vm.pageLoad();
+
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.pageLoaded["sale_center"] = true;
+
+				$('.nav li a').click(function(e) {
+			        //e.preventDefault();
+
+			        $('.nav li').removeClass('active');
+
+			        var $parent = $(this).parent();
+			        if (!$parent.hasClass('active')) {
+			            $parent.addClass('active');
+			        }			        
+			    });
+				
+				$("#dateSorter").kendoDropDownList({
+					dataTextField: "text",
+		            dataValueField: "value",
+				 	dataSource: [ 
+				 		{ text:"ទាំងអស់", value: "all" }, 
+				 		{ text:"ថ្ងៃនេះ", value: "today" }, 
+				 		{ text:"សប្ដាស៍នេះ", value: "week" }, 
+				 		{ text:"ខែនេះ", value: "month" }, 
+				 		{ text:"ឆ្នាំនេះ", value: "year" } 
+				 	],
+				  	change: function(e) {
+				    	var value = this.value();
+				    	
+				    	sorterChanges(value);			    	
+				  	}
+				});
+		        
+				var sdate = $("#startDate").kendoDatePicker({
+				    format: "dd-MM-yyyy"
+				}).data("kendoDatePicker");
+
+				var edate = $("#endDate").kendoDatePicker({
+				    format: "dd-MM-yyyy"
+				}).data("kendoDatePicker");				
+
+		        function sorterChanges(value){        	
+					switch(value){
+					case "today":
+						var today = new Date();
+						sdate.value(today);
+						edate.value(null);
+					  					
+					  	break;
+					case "week":
+					  	var thisWeek = new Date;
+						var first = thisWeek.getDate() - thisWeek.getDay(); 
+						var last = first + 6;
+
+						var firstDayOfWeek = new Date(thisWeek.setDate(first));
+						var lastDayOfWeek = new Date(thisWeek.setDate(last));
+
+						sdate.value(firstDayOfWeek);
+						edate.value(lastDayOfWeek);
+						
+					  	break;
+					case "month":
+						var thisMonth = new Date;				  	
+						var firstDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth(), 1);
+						var lastDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth() + 1, 0);
+
+						sdate.value(firstDayOfMonth);
+						edate.value(lastDayOfMonth);
+
+					  	break;
+					case "year":
+						var thisYear = new Date();
+					  	var firstDayOfYear = new Date(thisYear.getFullYear(), 0, 1);
+						var lastDayOfYear = new Date(thisYear.getFullYear(), 11, 31);
+
+						sdate.value(firstDayOfYear);
+						edate.value(lastDayOfYear);
+
+					  	break;
+					default:
+						sdate.value(null);
+						edate.value(null);					  
+					}
+				}
+
+				$("#search").click(function(e){
+		        	e.preventDefault();
+
+		        	var start = sdate.value(),
+		        		end = edate.value(),		        		
+		        		para = Array();
+
+		        	//Dates
+		        	if(start && end){
+		            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+		            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });            	            	
+		            }else if(start){
+		            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+		            }else if(end){
+		            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+		            }else{
+		            	
+		            }
+
+		            vm.dataSource.filter(para);		    		
+				});		
+			}								
+		}
+	});
+	banhji.router.route("/sale_summary", function(){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{			
+			banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
+			banhji.view.layout.showIn("#content", banhji.view.saleSummary);			
+
+			if(banhji.pageLoaded["sale_summary"]==undefined){
+				banhji.pageLoaded["sale_summary"] = true;
+
+				var vm = banhji.saleSummary;
+				vm.loadData([]);
+				
+				$("#dateSorter").kendoDropDownList({
+					dataTextField: "text",
+		            dataValueField: "value",
+				 	dataSource: [ 
+				 		{ text:"ទាំងអស់", value: "all" }, 
+				 		{ text:"ថ្ងៃនេះ", value: "today" }, 
+				 		{ text:"សប្ដាស៍នេះ", value: "week" }, 
+				 		{ text:"ខែនេះ", value: "month" }, 
+				 		{ text:"ឆ្នាំនេះ", value: "year" } 
+				 	],
+				  	change: function(e) {
+				    	var value = this.value();
+				    	
+				    	sorterChanges(value);
+				    	dateChanges();
+				  	}
+				});
+
+				var sdate = $("#startDate").kendoDatePicker({
+				    format: "dd-MM-yyyy",
+				    change: dateChanges
+				}).data("kendoDatePicker");
+
+				var edate = $("#endDate").kendoDatePicker({
+				    format: "dd-MM-yyyy",
+				    change: dateChanges
+				}).data("kendoDatePicker");				
+
+				function dateChanges() {
+		            var start = sdate.value(),
+		            	end = edate.value();
+
+		            if(start && end){
+		            	$("#lblStartDate").text("ចាប់ពីថ្ងៃទី " + kendo.toString(start, "dd-MM-yyyy"));
+		            	$("#lblEndDate").text(" ដល់ " + kendo.toString(end, "dd-MM-yyyy"));            	            	
+		            }else if(start){
+		            	$("#lblStartDate").text("ថ្ងៃទី " + kendo.toString(start, "dd-MM-yyyy"));
+		            	$("#lblEndDate").text("");
+		            }else if(end){
+		            	$("#lblStartDate").text("");
+		            	$("#lblEndDate").text("គិតត្រឹម " + kendo.toString(end, "dd-MM-yyyy"));
+		            }else{
+		            	$("#lblStartDate").text("");
+		            	$("#lblEndDate").text("");
+		            }
+		        }
+
+		        function sorterChanges(value){        	
+					switch(value){
+					case "today":
+						var today = new Date();
+						sdate.value(today);
+						edate.value(null);
+					  					
+					  	break;
+					case "week":
+					  	var thisWeek = new Date;
+						var first = thisWeek.getDate() - thisWeek.getDay(); 
+						var last = first + 6;
+
+						var firstDayOfWeek = new Date(thisWeek.setDate(first));
+						var lastDayOfWeek = new Date(thisWeek.setDate(last));
+
+						sdate.value(firstDayOfWeek);
+						edate.value(lastDayOfWeek);
+						
+					  	break;
+					case "month":
+						var thisMonth = new Date;				  	
+						var firstDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth(), 1);
+						var lastDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth() + 1, 0);
+
+						sdate.value(firstDayOfMonth);
+						edate.value(lastDayOfMonth);
+
+					  	break;
+					case "year":
+						var thisYear = new Date();
+					  	var firstDayOfYear = new Date(thisYear.getFullYear(), 0, 1);
+						var lastDayOfYear = new Date(thisYear.getFullYear(), 11, 31);
+
+						sdate.value(firstDayOfYear);
+						edate.value(lastDayOfYear);
+
+					  	break;
+					default:
+						sdate.value(null);
+						edate.value(null);					  
+					}
+				}				
+
+				$("#search").click(function(e){
+		        	e.preventDefault();
+
+		        	var start = sdate.value(),
+		        		end = edate.value(),		        		
+		        		para = Array();
+
+		        	//Dates
+		        	if(start && end){
+		            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+		            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });            	            	
+		            }else if(start){
+		            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+		            }else if(end){
+		            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+		            }else{
+		            	
+		            }
+
+		            vm.loadData(para);	    		
+				});
+			}								
+		}
+	});	
 
 
 	banhji.router.route('/login', function() {
