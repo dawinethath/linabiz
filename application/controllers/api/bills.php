@@ -14,7 +14,7 @@ class bills extends REST_Controller {
 	function index_get() {		
 		$filters 	= $this->get("filter")["filters"];		
 		$page 		= $this->get('page') !== false ? $this->get('page') : 1;		
-		$limit 		= $this->get('limit') !== false ? $this->get('limit') : 100;								
+		$limit 		= $this->get('limit') !== false ? $this->get('limit') : 50;								
 		$sort 	 	= $this->get("sort");		
 		$data["results"] = array();
 		$data["count"] = 0;
@@ -713,12 +713,11 @@ class bills extends REST_Controller {
 		$unpaid->where("deleted", 0);
 		$unpaid->get();		
 		
-		$paid = $sale->amount - $unpaid->amount;
+		$paid = floatval($sale->amount) - floatval($unpaid->amount);
 		
 		//Invest		
 		$invest->select_sum('amount');		
-		$invest->where("type", "invest");
-		$invest->where("status", 0);
+		$invest->where("type", "invest");		
 		$invest->where("deleted", 0);
 		$invest->get();		
 		
@@ -728,7 +727,7 @@ class bills extends REST_Controller {
 		$income->where("deleted", 0);
 		$income->get();
 		
-		$total_income = $paid + $invest->amount + $income->amount;
+		$total_income = $paid + floatval($invest->amount) + floatval($income->amount);
 				
 		//Bill		
 		$bill->select_sum('amount');		
@@ -743,7 +742,7 @@ class bills extends REST_Controller {
 		$unbill->where("deleted", 0);
 		$unbill->get();		
 		
-		$billed = $bill->amount - $unbill->amount;
+		$billed = floatval($bill->amount) - floatval($unbill->amount);
 		
 		//Salary		
 		$salary->select_sum('amount');		
@@ -763,25 +762,25 @@ class bills extends REST_Controller {
 		$expense->where("deleted", 0);
 		$expense->get();					
 
-		$total_expense = $billed + $invest->salary + $witdraw->amount + $witdraw->expense;
+		$total_expense = $billed + floatval($salary->amount) + floatval($witdraw->amount) + floatval($expense->amount);
 		
 		$total = $total_income - $total_expense;		
 
 		$data["results"][] = array(
 			"sale"			=> floatval($sale->amount),
-			"unpaid"		=> floatval($sale->unpaid),
-			"paid"			=> floatval($paid),
+			"unpaid"		=> floatval($unpaid->amount),
+			"paid"			=> $paid,
 			"invest"		=> floatval($invest->amount),
 			"income"		=> floatval($income->amount),
-			"total_income"	=> floatval($total_income),
+			"total_income"	=> $total_income,
 
 			"bill"			=> floatval($bill->amount),
 			"unbill"		=> floatval($unbill->amount),
-			"billed"		=> floatval($billed),
+			"billed"		=> $billed,
 			"salary"		=> floatval($salary->amount),
 			"witdraw"		=> floatval($witdraw->amount),
 			"expense"		=> floatval($expense->amount),
-			"total_expense"	=> floatval($total_expense),
+			"total_expense"	=> $total_expense,
 
 			"total"			=> floatval($total)
 		);		

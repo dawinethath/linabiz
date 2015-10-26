@@ -479,18 +479,19 @@
 					</div>		          	
 	          	</div>
 
-	          	<br>	          	
+	          	<br>
 
-				<div>
-					<input id="dateSorter" />
-					<input id="startDate" placeHolder="ថ្ងៃទី" />
-					<input id="endDate" placeHolder="ដល់" />
-					<button type="button" id="search" class="btn btn-default"><i class="icon-search"></i></button>				
-				</div>
+				<input id="dateSorter" />
+				<input id="startDate" placeHolder="ថ្ងៃទី" />
+				<input id="endDate" placeHolder="ដល់" />
+				<button id="search" type="button" class="btn btn-default"><i class="icon-search"></i></button>						
+
+	          	<br>				
 
 				<div data-role="grid" 
-					data-bind="source: dataSource"
-					data-auto-bind="false"				    	        
+					data-bind="source: dataSource"					
+					data-auto-bind="false"
+					data-pageable="true"				    	        
 				    data-row-template="sale-center-row-template"						                           
 				    data-columns='[			    			
 			       		{ title: "កាលបរិច្ឆេទ" },
@@ -1818,7 +1819,7 @@
 			<br>
 
 			<div align="center">
-				<h4>របាយការណ៍សង្ខេប ចំណូល និង ចំណាយ</h4>
+				<h4>របាយការណ៍សង្ខេប ចំណូល និង ចំណាយ ជាសាច់ប្រាក់</h4>
 				
 				<span id="lblStartDate"></span>																	
 				<span id="lblEndDate"></span>									
@@ -1830,85 +1831,99 @@
 				<table class="table table-condensed table-vertical-center table-thead-simple">
 					<thead>
 						<tr>																			
-							<th>ពណ៌នា</th>
-							<th class="center">ទឹកប្រាក់</th>							
+							<th>ពណ៌នា</th>							
+							<th class="right">ទឹកប្រាក់</th>
+							<th class="right">សរុប</th>							
 						</tr>
 					</thead>
 					<tbody>
 						<tr class="selectable">													
-							<td class="important">លក់</td>				
-							<td class="center">
+							<td class="important"><a data-bind="click: goSale">លក់</a></td>				
+							<td class="right">
 								$ <span data-bind="text: obj.sale"></span>
-							</td>							
+							</td>
+							<td></td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important">អតិថិជនជំពាក់</td>				
-							<td class="center">
+							<td class="important"><a data-bind="click: goUnpaid">អតិថិជនជំពាក់</a></td>				
+							<td class="right">
 								$ <span data-bind="text: obj.unpaid"></span>
-							</td>							
+							</td>
+							<td></td>							
 						</tr>
 						<tr class="selectable">													
 							<td class="important">ទទួលប្រាក់សុទ្ធ</td>				
+							<td></td>
 							<td class="right">
 								$ <span data-bind="text: obj.paid"></span>
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important">វិនិយោគ</td>				
+							<td class="important"><a data-bind="click: goInvest">វិនិយោគ</a></td>
+							<td></td>				
 							<td class="right">
 								$ <span data-bind="text: obj.invest"></span>
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important">ចំណូលផ្សេងៗ</td>				
+							<td class="important"><a data-bind="click: goIncome">ចំណូលផ្សេងៗ</a></td>
+							<td></td>				
 							<td class="right">
 								$ <span data-bind="text: obj.income"></span>
 							</td>						
 						</tr>
 						<tr class="selectable alert-info">													
-							<td class="important strong">សរុប​ ចំណូល</td>				
+							<td class="important strong">សរុប​ ចំណូល</td>	
+							<td></td>			
 							<td class="right">
 								$ <span data-bind="text: obj.total_income"></span>
 							</td>						
 						</tr>
 						<tr class="selectable">													
-							<td class="important">ទិញ</td>				
-							<td class="center">
+							<td class="important"><a data-bind="click: goBill">ទិញ</a></td>				
+							<td class="right">
 								$ <span data-bind="text: obj.bill"></span>
-							</td>						
+							</td>
+							<td></td>						
 						</tr>
 						<tr class="selectable">													
-							<td class="important">ជំពាក់អ្នកផ្គត់ផ្គង់</td>				
-							<td class="center">
+							<td class="important"><a data-bind="click: goUnbill">ជំពាក់អ្នកផ្គត់ផ្គង់</a></td>				
+							<td class="right">
 								$ <span data-bind="text: obj.unbill"></span>
-							</td>						
+							</td>
+							<td></td>						
 						</tr>
 						<tr class="selectable">													
-							<td class="important">បង់ប្រាក់សុទ្ធ</td>				
+							<td class="important">បង់ប្រាក់សុទ្ធ</td>
+							<td></td>				
 							<td class="right">
 								$ <span data-bind="text: obj.billed"></span>
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important">ប្រាក់ខែ</td>				
+							<td class="important"><a data-bind="click: goSalary">ប្រាក់ខែ</a></td>
+							<td></td>				
 							<td class="right">
 								$ <span data-bind="text: obj.salary"></span>
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important">ដកប្រាក់</td>				
+							<td class="important"><a data-bind="click: goWitdraw">ដកប្រាក់</a></td>
+							<td></td>				
 							<td class="right">
 								$ <span data-bind="text: obj.witdraw"></span>
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important">ចំណាយផ្សេងៗ</td>				
+							<td class="important"><a data-bind="click: goExpense">ចំណាយផ្សេងៗ</a></td>
+							<td></td>				
 							<td class="right">
 								$ <span data-bind="text: obj.expense"></span>
 							</td>							
 						</tr>
 						<tr class="selectable alert-danger">													
-							<td class="important strong">សរុប ចំណាយ</td>				
+							<td class="important strong">សរុប ចំណាយ</td>
+							<td></td>				
 							<td class="right">
 								$ <span data-bind="text: obj.total_expense"></span>
 							</td>							
@@ -1917,6 +1932,7 @@
 					<tfoot>
 					    <tr class="selectable">													
 							<td class="important strong" style="font-size: medium; text-decoration: underline;">សរុប</td>
+							<td></td>
 							<td class="right strong" style="font-size: medium; text-decoration: underline;">
 								$ <span data-bind="text: obj.total"></span>
 							</td>														
@@ -2637,9 +2653,103 @@
             }
         }
     });
+
+	banhji.saleCenter =  kendo.observable({    	
+    	dataSource 		: dataStore(baseUrl + "bills"),
+    	outstandingDS 	: dataStore(baseUrl + "bills/outstanding"),    	
+    	
+    	searchField		: "",
+    	stock 			: null,
+    	product_id 		: 0,
+    	isEdit 			: false,
+    	
+    	totalBill 		: 0,
+    	totalSO 		: 0,
+    	totalOpenInvoice: 0,
+    	totalOverDue 	: 0,
+
+    	totalCount 		: 0,
+    	balance 		: 0,
+
+    	pageLoad 		: function(){
+    		
+    	},
+    	loadData 		: function(para){
+    		var self = this;
+
+    		this.dataSource.query({
+    			filter: para,
+    			sort: [
+    				{ field: "issued_date", dir: "desc" },
+    				{ field: "id", dir: "desc" }
+    			],
+    			page: 1,
+    			limit: 50
+    		}).then(function(){
+    			self.sumTotal();
+    		});
+    		
+    		this.loadOutStandingInvoice();
+    	},
+    	loadOutStandingInvoice : function(){
+			var self = this;
+
+			this.outstandingDS.filter([]);						
+			this.outstandingDS.bind("requestEnd", function(e){
+				var response = e.response.results;
+				
+				self.set("totalBill", response[0].totalBill);
+			  	self.set("totalSO", response[1].totalSO);
+			  	self.set("totalOpenInvoice", response[2].totalOpenInvoice);
+			  	self.set("totalMinProduct", response[3].totalMinProduct);			  	
+			});							
+		},
+    	loadOpenBill 	: function(){
+    		this.loadData([					
+				{ field: "type", value: "bill" },
+        		{ field: "status", operator: "where_in", value: [0,2] },
+        		{ field:"deleted", value: 0 }
+			]);
+    	},
+    	loadOpenSO 		: function(){
+    		this.loadData([					
+				{ field: "type", value: "so" },
+        		{ field: "status", value: 0 },
+        		{ field:"deleted", value: 0 }
+			]);
+    	},
+    	loadOpenInvoice 	: function(){
+    		this.loadData([					
+				{ field: "type", value: "invoice" },
+        		{ field: "status", operator: "where_in", value: [0,2] },
+        		{ field:"deleted", value: 0 }
+			]);
+    	},
+    	loadMinProduct 	: function(){			
+			banhji.product.dataSource.filter([				
+        		{ field: "status", value: 1 },
+        		{ field: "on_hand <=", value: "order_point" },
+        		{ field:"deleted", value: 0 }
+			]);
+
+			banhji.router.navigate('/products');			
+    	},
+    	sumTotal 		: function(){
+    		var self = this, sum = 0;
+
+    		$.each(this.dataSource.data(), function(index, value){
+
+				sum += kendo.parseFloat(value.amount);
+			});
+
+			self.set("totalCount", this.dataSource.total());
+			self.set("balance", kendo.toString(sum, "c3"));
+    	}    	
+    });
 	banhji.contactCenter =  kendo.observable({    	
     	dataSource 		: dataStore(baseUrl + "contacts"),
-    	 
+    	contactTypeDS 	: dataStore(baseUrl + "contacts/type"),
+
     	fieldList 		: [
     		{ id:"phone", name:"លេខទូរសព្ទ័" },
     		{ id:"name", name:"ឈ្មោះ" },
@@ -2651,13 +2761,24 @@
 
     	txtSearch 		: "",
     	fieldSearch 	: "phone",
+    	contactTypeID 	: 0,
 
     	pageLoad 		: function(){
     		
     	},
     	search 			: function(){
+    		var para = [];
+
     		if(this.get("txtSearch")!==""){
-    			this.dataSource.filter({ field: this.get("fieldSearch"), operator: "contains", value: this.get("txtSearch") });
+    			para.push({ field: this.get("fieldSearch"), value: this.get("txtSearch") });
+    		}
+
+    		if(this.get("contactTypeID")>0){
+    			para.push({ field: "contact_type_id", value: this.get("contactTypeID") });
+    		}
+
+    		if(para.length>0){
+    			this.dataSource.filter(para);
     		}
     	},
     	newContact 		: function(){
@@ -2666,7 +2787,7 @@
     	goBill 		: function(e){			
 			var d = e.data;
 
-			banhji.saleCenter.dataSource.filter([
+			banhji.saleCenter.loadData([
 				{ field:"contact_id", value: d.id },
 				{ field:"status", value: 0 },
 				{ field:"deleted", value: 0 }
@@ -2675,13 +2796,13 @@
 			banhji.router.navigate('/sale_center');	
 		}
     });
+
 	banhji.contact = kendo.observable({		
 		dataSource 	: dataStore(baseUrl + "contacts"),
 		contactTypeDS: dataStore(baseUrl + "contacts/type"),
 		currencyDS 	: dataStore(baseUrl + "currencies"),
 
-		contact 	: null,
-		contactTypeID : 0,			
+		contact 	: null,					
 		genders		: ["M", "F"],
 		statusList 	: [            
 			{ "id": 1, "name": "កំពុងប្រើប្រាស់" },
@@ -2758,79 +2879,7 @@
 				}				
 			});
 		}		
-	});
-    banhji.saleCenter =  kendo.observable({    	
-    	dataSource 		: dataStore(baseUrl + "bills"),
-    	outstandingDS 	: dataStore(baseUrl + "bills/outstanding"),    	
-    	
-    	searchField		: "",
-    	stock 			: null,
-    	product_id 		: 0,
-    	isEdit 			: false,
-
-    	totalBill 		: 0,
-    	totalSO 		: 0,
-    	totalOpenInvoice: 0,
-    	totalOverDue 	: 0,
-
-    	pageLoad 		: function(){
-    		
-    	},
-    	loadData 		: function(){
-    		this.dataSource.query({
-    			filter: { field:"deleted", value: 0 },
-    			sort: [
-    				{ field: "issued_date", dir: "desc" },
-    				{ field: "id", dir: "desc" }
-    			]
-    		});
-
-    		this.loadOutStandingInvoice();
-    	},
-    	loadOutStandingInvoice : function(){
-			var self = this;
-
-			this.outstandingDS.filter([]);						
-			this.outstandingDS.bind("requestEnd", function(e){
-				var response = e.response.results;
-				
-				self.set("totalBill", response[0].totalBill);
-			  	self.set("totalSO", response[1].totalSO);
-			  	self.set("totalOpenInvoice", response[2].totalOpenInvoice);
-			  	self.set("totalMinProduct", response[3].totalMinProduct);			  	
-			});							
-		},
-    	loadOpenBill 	: function(){
-    		this.dataSource.filter([					
-				{ field: "type", value: "bill" },
-        		{ field: "status", operator: "where_in", value: [0,2] },
-        		{ field:"deleted", value: 0 }
-			]);
-    	},
-    	loadOpenSO 		: function(){
-    		this.dataSource.filter([					
-				{ field: "type", value: "so" },
-        		{ field: "status", value: 0 },
-        		{ field:"deleted", value: 0 }
-			]);
-    	},
-    	loadOpenInvoice 	: function(){
-    		this.dataSource.filter([					
-				{ field: "type", value: "invoice" },
-        		{ field: "status", operator: "where_in", value: [0,2] },
-        		{ field:"deleted", value: 0 }
-			]);
-    	},
-    	loadMinProduct 	: function(){			
-			banhji.product.dataSource.filter([				
-        		{ field: "status", value: 1 },
-        		{ field: "on_hand <=", value: "order_point" },
-        		{ field:"deleted", value: 0 }
-			]);
-
-			banhji.router.navigate('/products');			
-    	}
-    });    	
+	});        	
     banhji.newProduct =  kendo.observable({    	
     	dataSource 	: dataStore(baseUrl + "products"),
     	categoryDS 	: dataStore(baseUrl + "categories"),    	
@@ -3921,6 +3970,7 @@
 			});
 		}    	
     });
+
     banhji.saleSummary =  kendo.observable({    	
     	dataSource 	: dataStore(baseUrl + "bills/sale_summary"),
     	
@@ -3939,6 +3989,120 @@
 				
 		    	self.set("obj", view[0]);		    	    	
 			});
+    	},
+    	goSale 			: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", operator: "where_in", value: ["invoice","bill"] },
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goUnpaid 		: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "invoice" },
+    			{ field:"status", value: 0 },
+    			{ field:"deleted", value: 0 }
+    		]);
+    		
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goPaid 			: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "invoice" },
+    			{ field:"status", value: 1 },
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goInvest 		: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "invest" },    			
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goIncome 		: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "income" },    			
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goBill 			: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "bill" },    			
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goUnbill 		: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "bill" },    			
+    			{ field:"status", value: 0 },
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goBilled 		: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "bill" },    			
+    			{ field:"status", value: 1 },
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goSalary 		: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "salary" },    			
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goWitdraw 		: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "width" },    			
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
+    	},
+    	goExpense 		: function(e){
+    		e.preventDefault();
+
+    		banhji.saleCenter.loadData([
+    			{ field:"type", value: "expense" },    			
+    			{ field:"deleted", value: 0 }
+    		]);
+
+    		banhji.router.navigate('/sale_center');
     	}  	
     });    	
 
@@ -4107,6 +4271,7 @@
 			if(banhji.pageLoaded["products"]==undefined){
 				banhji.pageLoaded["products"] = true;
 
+				banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
 				vm.vendorDS.filter({ field:"contact_type_id", value: 5 });
 			}	
 		}
@@ -4227,7 +4392,7 @@
 				banhji.pageLoaded["sale_center"] = true;
 
 				banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
-				vm.loadData();
+				vm.loadData([{ field:"deleted", value:0 }]);
 
 				$('.nav li a').click(function(e) {
 			        //e.preventDefault();
@@ -4343,6 +4508,7 @@
 			if(banhji.pageLoaded["sale_summary"]==undefined){
 				banhji.pageLoaded["sale_summary"] = true;
 
+				banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
 				var vm = banhji.saleSummary;
 				vm.loadData([]);
 				
