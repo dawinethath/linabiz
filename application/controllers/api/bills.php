@@ -29,7 +29,9 @@ class bills extends REST_Controller {
 		}
 		
 		//Filter		
-		if(!empty($filters) && isset($filters)){			
+		if(!empty($filters) && isset($filters)){
+			$deleted = 0;
+
 	    	foreach ($filters as $value) {
 	    		if(!empty($value["operator"]) && isset($value["operator"])){
 		    		if($value["operator"]=="where_in"){
@@ -62,17 +64,21 @@ class bills extends REST_Controller {
 		    		}else{
 		    			$obj->where($value["field"].' '.$value["operator"], $value["value"]);
 		    		}
-	    		}else{	    			
-	    			$obj->where($value["field"], $value["value"]);	    				    			
+	    		}else{
+	    			if($value["field"]=="deleted"){	    			
+	    				$deleted = 1;			    				    			
+	    			}else{
+	    				$obj->where($value["field"], $value["value"]);
+	    			}	
 	    		}
-			}									 			
+			}
+			
+			$obj->where("deleted", $deleted);											 			
 		}		
 
-		//Results
-		if(!empty($limit) && !empty($page)){
-			$obj->get_paged_iterated($page, $limit);
-			$data["count"] = $obj->paged->total_rows;							
-		}
+		//Results		
+		$obj->get_paged_iterated($page, $limit);
+		$data["count"] = $obj->paged->total_rows;	
 
 		if($obj->result_count()>0){			
 			foreach ($obj as $value) {								

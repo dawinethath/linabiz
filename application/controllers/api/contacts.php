@@ -29,7 +29,9 @@ class Contacts extends REST_Controller {
 		}
 
 		//Filter
-		if(!empty($filters) && isset($filters)){			
+		if(!empty($filters) && isset($filters)){
+			$deleted = 0;
+
 	    	foreach ($filters as $value) {
 	    		if(!empty($value["operator"]) && isset($value["operator"])){
 		    		if($value["operator"]=="where_in"){
@@ -64,9 +66,15 @@ class Contacts extends REST_Controller {
 		    			$obj->where($value["field"].' '.$value["operator"], $value["value"]);
 		    		}
 	    		}else{
-	    			$obj->where($value["field"], $value["value"]);
+	    			if($value["field"]=="deleted"){	    			
+	    				$deleted = 1;			    				    			
+	    			}else{
+	    				$obj->where($value["field"], $value["value"]);
+	    			}
 	    		}
-			}									 			
+			}
+
+			$obj->where("deleted", $deleted);									 			
 		}
 
 		if(!empty($limit) && !empty($page)){
