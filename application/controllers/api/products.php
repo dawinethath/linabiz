@@ -69,7 +69,7 @@ class Products extends REST_Controller {
 		    		}
 	    		}else{
 	    			if($value["field"]=="deleted"){	    			
-	    				$deleted = 1;			    				    			
+	    				$deleted = $value["value"];			    				    			
 	    			}else{
 	    				$obj->where($value["field"], $value["value"]);
 	    			}

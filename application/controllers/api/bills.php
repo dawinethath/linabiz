@@ -14,7 +14,7 @@ class bills extends REST_Controller {
 	function index_get() {		
 		$filters 	= $this->get("filter")["filters"];		
 		$page 		= $this->get('page') !== false ? $this->get('page') : 1;		
-		$limit 		= $this->get('limit') !== false ? $this->get('limit') : 50;								
+		$limit 		= $this->get('limit') !== false ? $this->get('limit') : 100;								
 		$sort 	 	= $this->get("sort");		
 		$data["results"] = array();
 		$data["count"] = 0;
@@ -57,16 +57,13 @@ class bills extends REST_Controller {
 		    		}else if($value["operator"]=="contains"){
 		    			$obj->like($value["field"], $value["value"], "both");
 		    		}else if($value["operator"]=="or_where"){
-		    			$obj->or_where($value["field"], $value["value"]);
-		    		}else if($value["operator"]=="where_related"){
-		    			$obj->include_related($value["table"], "id");		    					    			
-		    			$obj->where_related($value["table"], $value["field"], $value["value"]);		    		
+		    			$obj->or_where($value["field"], $value["value"]);		    			    		
 		    		}else{
 		    			$obj->where($value["field"].' '.$value["operator"], $value["value"]);
 		    		}
 	    		}else{
 	    			if($value["field"]=="deleted"){	    			
-	    				$deleted = 1;			    				    			
+	    				$deleted = $value["value"];			    				    			
 	    			}else{
 	    				$obj->where($value["field"], $value["value"]);
 	    			}	
@@ -217,10 +214,10 @@ class bills extends REST_Controller {
 			$obj->memo 			= $value->memo;				
 			$obj->address		= $value->address;
 			$obj->status		= $value->status;
-			$obj->issued_date	= $value->issued_date;			
-			$obj->due_date		= $value->due_date;
-			$obj->paid_date 	= $value->paid_date;
-			$obj->deleted 		= $value->deleted;
+			$obj->issued_date	= date("Y-m-d", strtotime($value->issued_date));			
+			$obj->due_date		= date("Y-m-d", strtotime($value->due_date));
+			$obj->paid_date 	= date("Y-m-d", strtotime($value->paid_date));
+			$obj->deleted 		= $value->deleted;			
 			
 			if($obj->save()){
 				//Results
@@ -302,6 +299,15 @@ class bills extends REST_Controller {
 		  	break;
 		case "income":
 		  	$header = "IN";
+		  	break;
+		case "invest":
+		  	$header = "INT";
+		  	break;
+		case "witdraw":
+		  	$header = "WIT";
+		  	break;
+		case "salary":
+		  	$header = "SLR";
 		  	break;						
 		default:
 		  	$header = "INV";
@@ -792,6 +798,78 @@ class bills extends REST_Controller {
 		);		
 
 		$this->response($data, 200);		
+	}
+
+	//GET AMOUNT
+	function amount_get() {		
+		$filters 	= $this->get("filter")["filters"];		
+		$page 		= $this->get('page') !== false ? $this->get('page') : 1;		
+		$limit 		= $this->get('limit') !== false ? $this->get('limit') : 50;								
+		$sort 	 	= $this->get("sort");		
+		$data["results"] = [];
+		$data["count"] = 0;
+
+		$obj = new Bill(null, $this->entity);		
+
+		//Sort
+		if(!empty($sort) && isset($sort)){					
+			foreach ($sort as $value) {
+				$obj->order_by($value["field"], $value["dir"]);
+			}
+		}
+		
+		//Filter		
+		if(!empty($filters) && isset($filters)){
+			$deleted = 0;
+
+	    	foreach ($filters as $value) {
+	    		if(!empty($value["operator"]) && isset($value["operator"])){
+		    		if($value["operator"]=="where_in"){
+		    			$obj->where_in($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="or_where_in"){
+		    			$obj->or_where_in($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="where_not_in"){
+		    			$obj->where_not_in($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="or_where_not_in"){
+		    			$obj->or_where_not_in($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="like"){
+		    			$obj->like($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="or_like"){
+		    			$obj->or_like($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="not_like"){
+		    			$obj->not_like($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="or_not_like"){
+		    			$obj->or_not_like($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="startswith"){
+		    			$obj->like($value["field"], $value["value"], "after");
+		    		}else if($value["operator"]=="endswith"){
+		    			$obj->like($value["field"], $value["value"], "before");
+		    		}else if($value["operator"]=="contains"){
+		    			$obj->like($value["field"], $value["value"], "both");
+		    		}else if($value["operator"]=="or_where"){
+		    			$obj->or_where($value["field"], $value["value"]);		    		 		
+		    		}else{
+		    			$obj->where($value["field"].' '.$value["operator"], $value["value"]);
+		    		}
+	    		}else{
+	    			if($value["field"]=="deleted"){	    			
+	    				$deleted = $value["value"];			    				    			
+	    			}else{
+	    				$obj->where($value["field"], $value["value"]);
+	    			}	
+	    		}
+			}
+			
+			$obj->where("deleted", $deleted);											 			
+		}		
+
+		//Results
+		$obj->select_sum("amount");		
+		$obj->get();
+		$data["results"][] = floatval($obj->amount);
+
+		//Response Data		
+		$this->response($data, 200);	
 	}	
 	
 }

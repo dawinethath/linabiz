@@ -481,10 +481,34 @@
 
 	          	<br>
 
+	          	<div class="row">
+	          		<div class="span6">
+						
+					</div>
+					<div class="span6">
+						<div class="innerAll padding-bottom-none-phone">
+							<a href="" class="widget-stats widget-stats-primary widget-stats-4">
+								<span class="txt">សមតុល្យសរុប</span>
+								<span class="count" style="font-size: 35px;" data-bind="text: balance"></span>
+								<span class="glyphicons coins"><i></i></span>
+								<div class="clearfix"></div>
+								<i class="icon-play-circle"></i>
+							</a>
+						</div>
+					</div>										
+				</div>
+
+	          	<br>
+
 				<input id="dateSorter" />
 				<input id="startDate" placeHolder="ថ្ងៃទី" />
 				<input id="endDate" placeHolder="ដល់" />
-				<button id="search" type="button" class="btn btn-default"><i class="icon-search"></i></button>						
+				<input id="ddlContact" data-bind="value: contact_id" style="width: 250px;" />
+				<input id="ddlBillType" style="width: 200px" />
+				<button id="search" type="button" class="btn btn-default"><i class="icon-search"></i></button>
+				<button type="button"  class="btn btn-default" data-bind="click: refresh"><i class="icon-refresh"></i></button>
+				|
+				ចំនួន <span data-bind="text: totalCount"></span>						
 
 	          	<br>				
 
@@ -521,9 +545,11 @@
         	#}#	
         </td>
         <td>
-        	#if(type==="receipt"){#
-        		បង្កាន់ដៃលក់	       	        		
-			#}else if(type==="so"){#
+        	#if(type==="invoice"){#
+        		វិក្កយបត្រ	       	        		
+			#}else if(type==="receipt"){#
+        		បង្កាន់ដៃលក់
+        	#}else if(type==="so"){#
         		បញ្ជាលក់
         	#}else if(type==="estimate"){#        		
         		សម្រង់តម្លៃ        	
@@ -535,30 +561,18 @@
         		<span class="label label-important">ចំណាយ</span>
         	#}else if(type==="income"){#
         		<span class="label label-success">ចំណូល</span>
+        	#}else if(type==="invest"){#
+        		វិនិយោគ
+        	#}else if(type==="witdraw"){#
+        		ដកប្រាក់
+        	#}else if(type==="salary"){#
+        		ប្រាក់ខែ
         	#}else{#
-        		វិក្កយបត្រ
+        		#=type#
         	#}#
         </td>
         <td>
-        	#if(type==="invoice"){#								
-				<a href="\#/bills/#=id#"><i></i> #=number#</a>	
-			#}else if(type==="receipt"){#
-        		<a href="\#/bills/#=id#"><i></i> #=number#</a>        	        		
-			#}else if(type==="so"){#
-        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
-        	#}else if(type==="estimate"){#        		
-        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
-        	#}else if(type==="bill"){#        		
-        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
-        	#}else if(type==="po"){#
-        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
-        	#}else if(type==="expense"){#
-        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
-        	#}else if(type==="income"){#
-        		<a href="\#/bills/#=id#"><i></i> #=number#</a>
-        	#}else{#
-        		#=number#
-        	#}#
+        	<a href="\#/bills/#=id#"><i></i> #=number#</a>
         </td>
         <td align="right">#:kendo.toString(amount, "c")#</td>
         <td>        	
@@ -931,7 +945,7 @@
 			           	{ title: "លេខទូរសព្ទ័" },
 			           	{ title: "ប្រភេទ" },
 			           	{ title: "សមតុល្យ" },	            
-			           	{ title: "", width:100 }                   	                    
+			           	{ title: "", width: 120 }                   	                    
 				    ]'></div>	
 
 			</div> <!-- // End div example-->  
@@ -951,10 +965,11 @@
 		<td>#=memo#</td>
 		<td>#=phone#</td>
 		<td>#=contact_type[0]==null?"":contact_type[0].name#</td>
-		<td>#=balance#</td>
+		<td align="right">#=kendo.toString(balance, "c")#</td>
 		<td>
 			<a href="\#/contact/#=id#" class="btn-action glyphicons eye_open btn-default"><i></i></a>
 			<span class="btn-action glyphicons usd btn-success" data-bind="click: goBill"><i></i></span>
+			<span class="btn-action glyphicons dashboard btn-inverse" data-bind="click: goAllBill"><i></i></span>
 		</td>		
 	</tr>     	
 </script>
@@ -1080,7 +1095,7 @@
 
 							<span id="save" class="btn btn-success btn-icon glyphicons ok_2"><i></i>រក្សាទុក</span>
 							<span class="btn btn-danger btn-icon glyphicons delete" data-bind="click: delete, visible: isEdit"><i></i>លុប</span>
-							<span class="btn btn-inverse btn-icon glyphicons remove_2" data-bind="click: cancelChanges"><i></i>បិទ</span>
+							<span class="btn btn-inverse btn-icon glyphicons remove_2" data-bind="click: cancel"><i></i>បិទ</span>
 						</div>
 					</div>
 					<!-- // Form actions END -->							
@@ -1500,7 +1515,8 @@
 						<td>
 							<input id="issuedDate" name="issuedDate"
 									data-role="datepicker"
-									data-format="dd-MM-yyyy"									
+									data-format="dd-MM-yyyy"
+									data-parse-formats: "yyyy-MM-dd"									
 				                    data-bind="value: bill.issued_date"
 				                    style="width: 100%"
 				                    required data-required-msg="ត្រូវការ ថ្ងៃចេញវិក្កបត្រ" />
@@ -1515,7 +1531,8 @@
 						<td>
 							<input id="dueDate" name="dueDate"
 									data-role="datepicker"
-									data-format="dd-MM-yyyy"									
+									data-format="dd-MM-yyyy"
+									data-parse-formats: "yyyy-MM-dd"																		
 				                    data-bind="value: bill.due_date"
 				                    style="width: 100%"
 				                    required data-required-msg="ត្រូវការ ថ្ងៃផុតកំណត់" />
@@ -1838,14 +1855,14 @@
 					</thead>
 					<tbody>
 						<tr class="selectable">													
-							<td class="important"><a data-bind="click: goSale">លក់</a></td>				
+							<td class="important"><a id="goSale">លក់</a></td>				
 							<td class="right">
 								<span data-bind="text: sale"></span>
 							</td>
 							<td></td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important"><a data-bind="click: goUnpaid">អតិថិជនជំពាក់</a></td>				
+							<td class="important"><a id="goUnpaid">អតិថិជនជំពាក់</a></td>				
 							<td class="right">
 								<span data-bind="text: unpaid"></span>
 							</td>
@@ -1859,14 +1876,14 @@
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important"><a data-bind="click: goInvest">វិនិយោគ</a></td>
+							<td class="important"><a id="goInvest">វិនិយោគ</a></td>
 							<td></td>				
 							<td class="right">
 								<span data-bind="text: invest"></span>
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important"><a data-bind="click: goIncome">ចំណូលផ្សេងៗ</a></td>
+							<td class="important"><a id="goIncome">ចំណូលផ្សេងៗ</a></td>
 							<td></td>				
 							<td class="right">
 								<span data-bind="text: income"></span>
@@ -1880,14 +1897,14 @@
 							</td>						
 						</tr>
 						<tr class="selectable">													
-							<td class="important"><a data-bind="click: goBill">ទិញ</a></td>				
+							<td class="important"><a id="goBill">ទិញ</a></td>				
 							<td class="right">
 								<span data-bind="text: bill"></span>
 							</td>
 							<td></td>						
 						</tr>
 						<tr class="selectable">													
-							<td class="important"><a data-bind="click: goUnbill">ជំពាក់អ្នកផ្គត់ផ្គង់</a></td>				
+							<td class="important"><a id="goUnbill">ជំពាក់អ្នកផ្គត់ផ្គង់</a></td>				
 							<td class="right">
 								<span data-bind="text: unbill"></span>
 							</td>
@@ -1901,21 +1918,21 @@
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important"><a data-bind="click: goSalary">ប្រាក់ខែ</a></td>
+							<td class="important"><a id="goSalary">ប្រាក់ខែ</a></td>
 							<td></td>				
 							<td class="right">
 								<span data-bind="text: salary"></span>
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important"><a data-bind="click: goWitdraw">ដកប្រាក់</a></td>
+							<td class="important"><a id="goWitdraw">ដកប្រាក់</a></td>
 							<td></td>				
 							<td class="right">
 								<span data-bind="text: witdraw"></span>
 							</td>							
 						</tr>
 						<tr class="selectable">													
-							<td class="important"><a data-bind="click: goExpense">ចំណាយផ្សេងៗ</a></td>
+							<td class="important"><a id="goExpense">ចំណាយផ្សេងៗ</a></td>
 							<td></td>				
 							<td class="right">
 								<span data-bind="text: expense"></span>
@@ -1932,7 +1949,9 @@
 					<tfoot>
 					    <tr class="selectable">													
 							<td class="important strong" style="font-size: medium; text-decoration: underline;">សរុប</td>
-							<td></td>
+							<td>
+								
+							</td>
 							<td class="right strong" style="font-size: medium; text-decoration: underline;">
 								<span data-bind="text: total"></span>
 							</td>														
@@ -2172,9 +2191,10 @@
 					parameterMap: function(options, operation) {
 						if(operation === 'read') {
 							return {
-								limit: options.take,
 								page: options.page,
-								filter: options.filter
+								limit: options.pageSize,								
+								filter: options.filter,
+								sort: options.sort
 							};
 						} else {
 							return {models: kendo.stringify(options.models)};
@@ -2191,6 +2211,8 @@
 				batch: true,
 				serverFiltering: true,
 				serverPaging: true,
+				serverSorting: true,
+				page: 1,
 				pageSize: 100
 			});
 		return o;
@@ -2656,9 +2678,12 @@
 
 	banhji.saleCenter =  kendo.observable({    	
     	dataSource 		: dataStore(baseUrl + "bills"),
-    	outstandingDS 	: dataStore(baseUrl + "bills/outstanding"),    	
+    	outstandingDS 	: dataStore(baseUrl + "bills/outstanding"),
+    	contactDS 		: dataStore(baseUrl + "contacts"),
+    	amountDS		: dataStore(baseUrl + "bills/amount"),    	
     	
     	searchField		: "",
+    	contact_id 		: "",
     	stock 			: null,
     	product_id 		: 0,
     	isEdit 			: false,
@@ -2674,9 +2699,20 @@
     	pageLoad 		: function(){
     		
     	},
+    	refresh 		: function(e){
+    		e.preventDefault();
+    		var self = this;
+     		
+      		this.loadData([]);
+
+      		this.contactDS.filter([]);
+      		this.contactDS.bind("requestEnd", function(){
+      			self.set("contact_id", "");
+      		});
+    	},
     	loadData 		: function(para){
     		var self = this;
-
+    		
     		this.dataSource.query({
     			filter: para,
     			sort: [
@@ -2684,11 +2720,21 @@
     				{ field: "id", dir: "desc" }
     			],
     			page: 1,
-    			limit: 50
+    			pageSize: 50
+    		}).then(function(){
+    			var count = kendo.toString(self.dataSource.total(), "n0");   			
+    			self.set("totalCount", count);
     		});
-    		
+    		  
+    		self.amountDS.filter(para);
+    		self.amountDS.bind("requestEnd", function(e){
+    			var response = e.response.results;
+    			
+    			self.set("balance", kendo.toString(response[0], "c"));
+    		});
+
     		this.loadOutStandingInvoice();
-    	},
+    	},    	
     	loadOutStandingInvoice : function(){
 			var self = this;
 
@@ -2774,6 +2820,21 @@
 				{ field:"contact_id", value: d.id },
 				{ field:"status", value: 0 }
 			]);
+			banhji.saleCenter.contactDS.filter({ field:"id", value: d.id });
+			banhji.saleCenter.contactDS.bind("requestEnd", function(e){
+				banhji.saleCenter.set("contact_id", d.id);
+			});
+
+			banhji.router.navigate('/sale_center');	
+		},
+		goAllBill 		: function(e){			
+			var d = e.data;
+
+			banhji.saleCenter.loadData({ field:"contact_id", value: d.id });
+			banhji.saleCenter.contactDS.filter({ field:"id", value: d.id });
+			banhji.saleCenter.contactDS.bind("requestEnd", function(e){
+				banhji.saleCenter.set("contact_id", d.id);
+			});
 
 			banhji.router.navigate('/sale_center');	
 		}
@@ -2841,10 +2902,11 @@
 				this.set("contact", obj);
 			}	
 		},
-		cancel: function(e){
+		cancel 		: function(e){
 			e.preventDefault();
 
-			this.dataSource.cancelChanges();			
+			this.dataSource.cancelChanges();
+			window.history.back();			
 		},
 		save 		: function(){
 			var self = this;
@@ -2857,7 +2919,7 @@
 
 					self.dataSource.data([]);					
 					self.addEmpty();
-					banhji.contact_center.dataSource.fetch();
+					banhji.contactCenter.dataSource.fetch();
 				}				
 			});
 		}		
@@ -3225,7 +3287,7 @@
     	contactSearchDS : dataStore(baseUrl + "contacts"),    		   	   	
     	unitDS 		 	: dataStore(baseUrl + "units"),    	
     	stockDS 		: dataStore(baseUrl + "stocks"),
-    	    	
+
     	bill 			: null,
     	contact 		: null,
     	biller_id 		: 1,    	
@@ -3729,7 +3791,10 @@
       	},
       	update 			: function(){
       		var bill = this.get("bill"),
-      		contact = this.get("contact");
+      		contact = this.get("contact");      	
+
+      		bill.set("issued_date", kendo.toString(bill.issued_date, "yyyy-MM-dd"));
+      		bill.set("due_date", kendo.toString(bill.due_date, "yyyy-MM-dd"));
 
       		if(bill.contact_id!==contact.id){
       			bill.set("contact_id", contact.id);
@@ -3941,7 +4006,9 @@
     banhji.saleSummary =  kendo.observable({    	
     	dataSource 	: dataStore(baseUrl + "bills/sale_summary"),
     	
-    	obj 		: null,
+    	obj 		: null,    	
+    	start_date 	: "",
+    	end_date 	: "",
 
     	sale 		: 0,
     	unpaid 		: 0,
@@ -3984,98 +4051,11 @@
 		    	self.set("salary", kendo.toString(view[0].salary, "c"));
 		    	self.set("witdraw", kendo.toString(view[0].witdraw, "c"));
 		    	self.set("expense", kendo.toString(view[0].expense, "c"));
-		    	self.set("total_expense", kendo.toString(view[0].total_expense, "c"));	    	    	
+		    	self.set("total_expense", kendo.toString(view[0].total_expense, "c"));
+
+		    	self.set("total", kendo.toString(view[0].total, "c"));	    	    	
 			});
-    	},
-    	goSale 			: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData({ field:"type", operator: "where_in", value: ["invoice","bill"] });
-
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goUnpaid 		: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData([
-    			{ field:"type", value: "invoice" },
-    			{ field:"status", value: 0 }
-    		]);
-    		
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goPaid 			: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData([
-    			{ field:"type", value: "invoice" },
-    			{ field:"status", value: 1 }
-    		]);
-
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goInvest 		: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData({ field:"type", value: "invest" });
-
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goIncome 		: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData({ field:"type", value: "income" });
-
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goBill 			: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData({ field:"type", value: "bill" });
-
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goUnbill 		: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData([
-    			{ field:"type", value: "bill" },    			
-    			{ field:"status", value: 0 }
-    		]);
-
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goBilled 		: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData([
-    			{ field:"type", value: "bill" },    			
-    			{ field:"status", value: 1 }
-    		]);
-
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goSalary 		: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData({ field:"type", value: "salary" });
-
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goWitdraw 		: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData({ field:"type", value: "width" });
-
-    		banhji.router.navigate('/sale_center');
-    	},
-    	goExpense 		: function(e){
-    		e.preventDefault();
-
-    		banhji.saleCenter.loadData({ field:"type", value: "expense" });
-
-    		banhji.router.navigate('/sale_center');
-    	}  	
+    	}    	
     });    	
 
 	<!-- //views and layout -->
@@ -4129,232 +4109,10 @@
 		banhji.view.layout.showIn('#content', banhji.view.index);
 	});
 
-	banhji.router.route("/contact_center", function(id){
-		if(!auth.getLogin()){
-			banhji.router.navigate('/login');
-		}else{
-			var vm = banhji.contactCenter;
-			
-			banhji.view.layout.showIn("#content", banhji.view.contactCenter);				
-			
-			if(banhji.pageLoaded["contact_center"]==undefined){
-				banhji.pageLoaded["contact_center"] = true;
-
-				banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
-
-			}	
-		}
-	});
-	banhji.router.route("/contact(/:id)", function(id){
-		if(!auth.getLogin()){
-			banhji.router.navigate('/login');
-		}else{
-			var vm = banhji.contact;
-			
-			banhji.view.layout.showIn("#content", banhji.view.contact);
-
-			vm.pageLoad(id);			
-			
-			if(banhji.pageLoaded["contact"]==undefined){
-				banhji.pageLoaded["contact"] = true;
-
-				var validator = $("#example").kendoValidator().data("kendoValidator");
-				var notification = $("#notification").kendoNotification({				    
-				    autoHideAfter: 5000,
-				    width: 300,				    
-				    height: 50
-				}).data('kendoNotification');
-
-		        $("#save").click(function(e){				
-					e.preventDefault();
-
-					if(validator.validate()){
-		            	vm.save();
-
-		            	notification.success("កត់ត្រាបានសំរេច");			  
-			        }else{
-			        	notification.error("សូមត្រួតពិនិត្រឪ្យបានត្រឹមត្រូវម្ដងទៀត");			           
-			        }		            
-				});
-			}	
-		}
-	});
-	banhji.router.route("/new_product(/:id)", function(id){
-		if(!auth.getLogin()){
-			banhji.router.navigate('/login');
-		}else{
-			var vm = banhji.newProduct;
-			
-			banhji.view.layout.showIn("#content", banhji.view.newProduct);
-
-			vm.pageLoad(id);			
-			
-			if(banhji.pageLoaded["new_product"]==undefined){
-				banhji.pageLoaded["new_product"] = true;
-
-				var validator = $("#example").kendoValidator().data("kendoValidator");
-				var notification = $("#notification").kendoNotification({				    
-				    autoHideAfter: 5000,
-				    width: 300,				    
-				    height: 50
-				}).data('kendoNotification');
-
-		        $("#save").click(function(e){				
-					e.preventDefault();
-
-					if(validator.validate()){
-		            	vm.save();
-
-		            	notification.success("កត់ត្រាបានសំរេច");			  
-			        }else{
-			        	notification.error("សូមត្រួតពិនិត្រឪ្យបានត្រឹមត្រូវម្ដងទៀត");			           
-			        }		            
-				});
-			}	
-		}
-	});
-	banhji.router.route("/price_list/:id", function(id){
-		if(!auth.getLogin()){
-			banhji.router.navigate('/login');
-		}else{
-			var vm = banhji.priceList;
-			
-			banhji.view.layout.showIn("#content", banhji.view.priceList);
-
-			vm.pageLoad(id);			
-			
-			if(banhji.pageLoaded["price_list"]==undefined){
-				banhji.pageLoaded["price_list"] = true;
-
-				
-			}	
-		}
-	});
-	banhji.router.route("/products", function(){
-		if(!auth.getLogin()){
-			banhji.router.navigate('/login');
-		}else{
-			var vm = banhji.product;
-			
-			banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
-			banhji.view.layout.showIn("#content", banhji.view.product);
-			vm.pageLoad();			
-			
-			if(banhji.pageLoaded["products"]==undefined){
-				banhji.pageLoaded["products"] = true;
-
-				banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
-				vm.vendorDS.filter({ field:"contact_type_id", value: 5 });
-			}	
-		}
-	});
-	banhji.router.route("/new_stock/:id", function(id){
-		if(!auth.getLogin()){
-			banhji.router.navigate('/login');
-		}else{
-			var vm = banhji.newStock;
-			banhji.view.layout.showIn("#content", banhji.view.newStock);
-
-			vm.pageLoad(id);			
-			
-			if(banhji.pageLoaded["new_stock"]==undefined){
-				banhji.pageLoaded["new_stock"] = true;
-
-				var validator = $("#example").kendoValidator().data("kendoValidator");
-				var notification = $("#notification").kendoNotification({				    
-				    autoHideAfter: 5000,
-				    width: 300,				    
-				    height: 50
-				}).data('kendoNotification');
-
-		        $("#save").click(function(e){				
-					e.preventDefault();
-
-					if(validator.validate()){
-		            	vm.save();
-
-		            	notification.success("កត់ត្រាបានសំរេច");			  
-			        }else{
-			        	notification.error("សូមត្រួតពិនិត្រឪ្យបានត្រឹមត្រូវម្ដងទៀត");			           
-			        }		            
-				});	            
-			}	
-		}
-	});
-	banhji.router.route("/bills(/:id)", function(id){
-		if(!auth.getLogin()){
-			banhji.router.navigate('/login');
-		}else{
-			var vm = banhji.bill;
-			banhji.view.layout.showIn("#content", banhji.view.bill);
-
-			vm.pageLoad(id);
-
-			if(banhji.pageLoaded["bills"]==undefined){
-				banhji.pageLoaded["bills"] = true;				
-
-				$("#ddlCustomer").kendoComboBox({
-                    placeholder: "ឈ្មោះ...",
-                    dataTextField: "fullIdName",
-                    dataValueField: "id",
-                    filter: "search",
-                    autoBind: false,
-                    minLength: 3,
-                    dataSource: vm.contactSearchDS,
-                    change: function(e) {
-					    var value = this.value();
-
-					    if(value!==""){
-					    	vm.loadContact(value);
-						}else{							
-							vm.removeSearch();
-						}
-					}
-                });
-
-				var validator = $("#example").kendoValidator().data("kendoValidator");
-				var notification = $("#notification").kendoNotification({				    
-				    autoHideAfter: 5000,
-				    width: 300,				    
-				    height: 50
-				}).data('kendoNotification');
-
-		        $("#save").click(function(e){				
-					e.preventDefault();
-
-					if(validator.validate()){
-		            	vm.save();
-
-		            	notification.success("កត់ត្រាបានសំរេច");			  
-			        }else{
-			        	notification.error("សូមត្រួតពិនិត្រឪ្យបានត្រឹមត្រូវម្ដងទៀត");			           
-			        }		            
-				});				
-			}								
-		}
-	});	
-	banhji.router.route("/invoice_print(/:id)", function(id){
-		if(!auth.getLogin()){
-			banhji.router.navigate('/login');
-		}else{
-			var vm = banhji.invoicePrint;
-			banhji.view.layout.showIn("#content", banhji.view.invoicePrint);
-
-			vm.pageLoad(id);					
-		}
-	});
-	banhji.router.route("/rInvoice_print", function(){
-		if(!auth.getLogin()){
-			banhji.router.navigate('/login');
-		}else{
-			banhji.view.layout.showIn("#content", banhji.view.rInvoicePrint);
-			kendo.fx($("#slide-form")).slideIn("down").play();			
-		}
-	});
 	banhji.router.route("/sale_center", function(){
 		if(!auth.getLogin()){
 			banhji.router.navigate('/login');
-		}else{
+		}else{			
 			var vm = banhji.saleCenter;			
 			banhji.view.layout.showIn("#content", banhji.view.saleCenter);
 
@@ -4365,6 +4123,23 @@
 
 				banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
 				vm.loadData([]);
+
+				var contact = $("#ddlContact").kendoComboBox({
+                    placeholder: "ឈ្មោះ...",
+                    dataTextField: "fullIdName",
+                    dataValueField: "id",
+                    filter: "search",
+                    autoBind: false,
+                    minLength: 3,
+                    dataSource: vm.contactDS
+                }).data("kendoComboBox");
+
+                var billType = $("#ddlBillType").kendoDropDownList({
+                	optionLabel: "(--- រើសប្រភេទ ---)",
+                    dataTextField: "name",
+                    dataValueField: "id",
+                    dataSource: banhji.bill.typeList
+                }).data("kendoDropDownList");
 
 				$('.nav li a').click(function(e) {
 			        //e.preventDefault();
@@ -4451,7 +4226,7 @@
 
 		        	var start = sdate.value(),
 		        		end = edate.value(),		        		
-		        		para = Array();
+		        		para = [];
 
 		        	//Dates
 		        	if(start && end){
@@ -4465,137 +4240,636 @@
 		            	
 		            }
 
-		            vm.dataSource.filter(para);		    		
+		            if(contact.value()){
+		            	para.push({ field:"contact_id", value: contact.value() });
+		            }
+
+		            if(billType.value()){
+		            	para.push({ field:"type", value: billType.value() });
+		            }
+
+		            vm.loadData(para);		    		
 				});		
-			}								
+			}											
 		}
 	});
+	banhji.router.route("/contact_center", function(id){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{
+				var vm = banhji.contactCenter;
+				
+				banhji.view.layout.showIn("#content", banhji.view.contactCenter);				
+				
+				if(banhji.pageLoaded["contact_center"]==undefined){
+					banhji.pageLoaded["contact_center"] = true;					
+
+				}
+			}	
+		}
+	});
+	banhji.router.route("/contact(/:id)", function(id){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{
+				var vm = banhji.contact;
+				
+				banhji.view.layout.showIn("#content", banhji.view.contact);
+
+				vm.pageLoad(id);			
+				
+				if(banhji.pageLoaded["contact"]==undefined){
+					banhji.pageLoaded["contact"] = true;
+
+					var validator = $("#example").kendoValidator().data("kendoValidator");
+					var notification = $("#notification").kendoNotification({				    
+					    autoHideAfter: 5000,
+					    width: 300,				    
+					    height: 50
+					}).data('kendoNotification');
+
+			        $("#save").click(function(e){				
+						e.preventDefault();
+
+						if(validator.validate()){
+			            	vm.save();
+
+			            	notification.success("កត់ត្រាបានសំរេច");			  
+				        }else{
+				        	notification.error("សូមត្រួតពិនិត្រឪ្យបានត្រឹមត្រូវម្ដងទៀត");			           
+				        }		            
+					});
+				}
+			}	
+		}
+	});
+	banhji.router.route("/new_product(/:id)", function(id){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{
+				var vm = banhji.newProduct;
+				
+				banhji.view.layout.showIn("#content", banhji.view.newProduct);
+
+				vm.pageLoad(id);			
+				
+				if(banhji.pageLoaded["new_product"]==undefined){
+					banhji.pageLoaded["new_product"] = true;
+
+					var validator = $("#example").kendoValidator().data("kendoValidator");
+					var notification = $("#notification").kendoNotification({				    
+					    autoHideAfter: 5000,
+					    width: 300,				    
+					    height: 50
+					}).data('kendoNotification');
+
+			        $("#save").click(function(e){				
+						e.preventDefault();
+
+						if(validator.validate()){
+			            	vm.save();
+
+			            	notification.success("កត់ត្រាបានសំរេច");			  
+				        }else{
+				        	notification.error("សូមត្រួតពិនិត្រឪ្យបានត្រឹមត្រូវម្ដងទៀត");			           
+				        }		            
+					});
+				}
+			}	
+		}
+	});
+	banhji.router.route("/price_list/:id", function(id){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{
+				var vm = banhji.priceList;
+				
+				banhji.view.layout.showIn("#content", banhji.view.priceList);
+
+				vm.pageLoad(id);			
+				
+				if(banhji.pageLoaded["price_list"]==undefined){
+					banhji.pageLoaded["price_list"] = true;
+
+					
+				}
+			}	
+		}
+	});
+	banhji.router.route("/products", function(){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{
+				var vm = banhji.product;				
+				
+				banhji.view.layout.showIn("#content", banhji.view.product);
+				vm.pageLoad();			
+				
+				if(banhji.pageLoaded["products"]==undefined){
+					banhji.pageLoaded["products"] = true;
+					
+					vm.vendorDS.filter({ field:"contact_type_id", value: 5 });
+				}
+			}	
+		}
+	});
+	banhji.router.route("/new_stock/:id", function(id){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{
+				var vm = banhji.newStock;
+				banhji.view.layout.showIn("#content", banhji.view.newStock);
+
+				vm.pageLoad(id);			
+				
+				if(banhji.pageLoaded["new_stock"]==undefined){
+					banhji.pageLoaded["new_stock"] = true;
+
+					var validator = $("#example").kendoValidator().data("kendoValidator");
+					var notification = $("#notification").kendoNotification({				    
+					    autoHideAfter: 5000,
+					    width: 300,				    
+					    height: 50
+					}).data('kendoNotification');
+
+			        $("#save").click(function(e){				
+						e.preventDefault();
+
+						if(validator.validate()){
+			            	vm.save();
+
+			            	notification.success("កត់ត្រាបានសំរេច");			  
+				        }else{
+				        	notification.error("សូមត្រួតពិនិត្រឪ្យបានត្រឹមត្រូវម្ដងទៀត");			           
+				        }		            
+					});	            
+				}
+			}	
+		}
+	});
+	banhji.router.route("/bills(/:id)", function(id){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{
+				var vm = banhji.bill;
+				banhji.view.layout.showIn("#content", banhji.view.bill);
+
+				vm.pageLoad(id);
+
+				if(banhji.pageLoaded["bills"]==undefined){
+					banhji.pageLoaded["bills"] = true;				
+
+					$("#ddlCustomer").kendoComboBox({
+	                    placeholder: "ឈ្មោះ...",
+	                    dataTextField: "fullIdName",
+	                    dataValueField: "id",
+	                    filter: "search",
+	                    autoBind: false,
+	                    minLength: 3,
+	                    dataSource: vm.contactSearchDS,
+	                    change: function(e) {
+						    var value = this.value();
+
+						    if(value!==""){
+						    	vm.loadContact(value);
+							}else{							
+								vm.removeSearch();
+							}
+						}
+	                });
+
+					var validator = $("#example").kendoValidator().data("kendoValidator");
+					var notification = $("#notification").kendoNotification({				    
+					    autoHideAfter: 5000,
+					    width: 300,				    
+					    height: 50
+					}).data('kendoNotification');
+
+			        $("#save").click(function(e){				
+						e.preventDefault();
+
+						if(validator.validate()){
+			            	vm.save();
+
+			            	notification.success("កត់ត្រាបានសំរេច");			  
+				        }else{
+				        	notification.error("សូមត្រួតពិនិត្រឪ្យបានត្រឹមត្រូវម្ដងទៀត");			           
+				        }		            
+					});				
+				}
+			}								
+		}
+	});	
+	banhji.router.route("/invoice_print(/:id)", function(id){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{
+				var vm = banhji.invoicePrint;
+				banhji.view.layout.showIn("#content", banhji.view.invoicePrint);
+
+				vm.pageLoad(id);
+			}					
+		}
+	});
+	banhji.router.route("/rInvoice_print", function(){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			banhji.view.layout.showIn("#content", banhji.view.rInvoicePrint);
+			kendo.fx($("#slide-form")).slideIn("down").play();			
+		}
+	});
+	
 	banhji.router.route("/sale_summary", function(){
 		if(!auth.getLogin()){
 			banhji.router.navigate('/login');
-		}else{			
-			banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
-			banhji.view.layout.showIn("#content", banhji.view.saleSummary);			
+		}else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{			
+				banhji.view.layout.showIn("#content", banhji.view.saleSummary);			
 
-			if(banhji.pageLoaded["sale_summary"]==undefined){
-				banhji.pageLoaded["sale_summary"] = true;
+				if(banhji.pageLoaded["sale_summary"]==undefined){
+					banhji.pageLoaded["sale_summary"] = true;
+					
+					var vm = banhji.saleSummary;
+					vm.loadData([]);
+					
+					$("#dateSorter").kendoDropDownList({
+						dataTextField: "text",
+			            dataValueField: "value",
+					 	dataSource: [ 
+					 		{ text:"ទាំងអស់", value: "all" }, 
+					 		{ text:"ថ្ងៃនេះ", value: "today" }, 
+					 		{ text:"សប្ដាស៍នេះ", value: "week" }, 
+					 		{ text:"ខែនេះ", value: "month" }, 
+					 		{ text:"ឆ្នាំនេះ", value: "year" } 
+					 	],
+					  	change: function(e) {
+					    	var value = this.value();
+					    	
+					    	sorterChanges(value);
+					    	dateChanges();
+					  	}
+					});
 
-				banhji.view.layout.showIn('#menu-barr', banhji.view.menu);
-				var vm = banhji.saleSummary;
-				vm.loadData([]);
-				
-				$("#dateSorter").kendoDropDownList({
-					dataTextField: "text",
-		            dataValueField: "value",
-				 	dataSource: [ 
-				 		{ text:"ទាំងអស់", value: "all" }, 
-				 		{ text:"ថ្ងៃនេះ", value: "today" }, 
-				 		{ text:"សប្ដាស៍នេះ", value: "week" }, 
-				 		{ text:"ខែនេះ", value: "month" }, 
-				 		{ text:"ឆ្នាំនេះ", value: "year" } 
-				 	],
-				  	change: function(e) {
-				    	var value = this.value();
-				    	
-				    	sorterChanges(value);
-				    	dateChanges();
-				  	}
-				});
+					var sdate = $("#startDate").kendoDatePicker({
+					    format: "dd-MM-yyyy",
+					    change: dateChanges
+					}).data("kendoDatePicker");
 
-				var sdate = $("#startDate").kendoDatePicker({
-				    format: "dd-MM-yyyy",
-				    change: dateChanges
-				}).data("kendoDatePicker");
+					var edate = $("#endDate").kendoDatePicker({
+					    format: "dd-MM-yyyy",
+					    change: dateChanges
+					}).data("kendoDatePicker");				
 
-				var edate = $("#endDate").kendoDatePicker({
-				    format: "dd-MM-yyyy",
-				    change: dateChanges
-				}).data("kendoDatePicker");				
+					function dateChanges() {
+			            var start = sdate.value(),
+			            	end = edate.value();
 
-				function dateChanges() {
-		            var start = sdate.value(),
-		            	end = edate.value();
+			            if(start && end){
+			            	$("#lblStartDate").text("ចាប់ពីថ្ងៃទី " + kendo.toString(start, "dd-MM-yyyy"));
+			            	$("#lblEndDate").text(" ដល់ " + kendo.toString(end, "dd-MM-yyyy"));            	            	
+			            }else if(start){
+			            	$("#lblStartDate").text("ថ្ងៃទី " + kendo.toString(start, "dd-MM-yyyy"));
+			            	$("#lblEndDate").text("");
+			            }else if(end){
+			            	$("#lblStartDate").text("");
+			            	$("#lblEndDate").text("គិតត្រឹម " + kendo.toString(end, "dd-MM-yyyy"));
+			            }else{
+			            	$("#lblStartDate").text("");
+			            	$("#lblEndDate").text("");
+			            }
+			        }
 
-		            if(start && end){
-		            	$("#lblStartDate").text("ចាប់ពីថ្ងៃទី " + kendo.toString(start, "dd-MM-yyyy"));
-		            	$("#lblEndDate").text(" ដល់ " + kendo.toString(end, "dd-MM-yyyy"));            	            	
-		            }else if(start){
-		            	$("#lblStartDate").text("ថ្ងៃទី " + kendo.toString(start, "dd-MM-yyyy"));
-		            	$("#lblEndDate").text("");
-		            }else if(end){
-		            	$("#lblStartDate").text("");
-		            	$("#lblEndDate").text("គិតត្រឹម " + kendo.toString(end, "dd-MM-yyyy"));
-		            }else{
-		            	$("#lblStartDate").text("");
-		            	$("#lblEndDate").text("");
-		            }
-		        }
+			        function sorterChanges(value){        	
+						switch(value){
+						case "today":
+							var today = new Date();
+							sdate.value(today);
+							edate.value(null);
+						  					
+						  	break;
+						case "week":
+						  	var thisWeek = new Date;
+							var first = thisWeek.getDate() - thisWeek.getDay(); 
+							var last = first + 6;
 
-		        function sorterChanges(value){        	
-					switch(value){
-					case "today":
-						var today = new Date();
-						sdate.value(today);
-						edate.value(null);
-					  					
-					  	break;
-					case "week":
-					  	var thisWeek = new Date;
-						var first = thisWeek.getDate() - thisWeek.getDay(); 
-						var last = first + 6;
+							var firstDayOfWeek = new Date(thisWeek.setDate(first));
+							var lastDayOfWeek = new Date(thisWeek.setDate(last));
 
-						var firstDayOfWeek = new Date(thisWeek.setDate(first));
-						var lastDayOfWeek = new Date(thisWeek.setDate(last));
+							sdate.value(firstDayOfWeek);
+							edate.value(lastDayOfWeek);
+							
+						  	break;
+						case "month":
+							var thisMonth = new Date;				  	
+							var firstDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth(), 1);
+							var lastDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth() + 1, 0);
 
-						sdate.value(firstDayOfWeek);
-						edate.value(lastDayOfWeek);
-						
-					  	break;
-					case "month":
-						var thisMonth = new Date;				  	
-						var firstDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth(), 1);
-						var lastDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth() + 1, 0);
+							sdate.value(firstDayOfMonth);
+							edate.value(lastDayOfMonth);
 
-						sdate.value(firstDayOfMonth);
-						edate.value(lastDayOfMonth);
+						  	break;
+						case "year":
+							var thisYear = new Date();
+						  	var firstDayOfYear = new Date(thisYear.getFullYear(), 0, 1);
+							var lastDayOfYear = new Date(thisYear.getFullYear(), 11, 31);
 
-					  	break;
-					case "year":
-						var thisYear = new Date();
-					  	var firstDayOfYear = new Date(thisYear.getFullYear(), 0, 1);
-						var lastDayOfYear = new Date(thisYear.getFullYear(), 11, 31);
+							sdate.value(firstDayOfYear);
+							edate.value(lastDayOfYear);
 
-						sdate.value(firstDayOfYear);
-						edate.value(lastDayOfYear);
+						  	break;
+						default:
+							sdate.value(null);
+							edate.value(null);					  
+						}
+					}				
 
-					  	break;
-					default:
-						sdate.value(null);
-						edate.value(null);					  
-					}
-				}				
+					$("#search").click(function(e){
+			        	e.preventDefault();
 
-				$("#search").click(function(e){
-		        	e.preventDefault();
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
 
-		        	var start = sdate.value(),
-		        		end = edate.value(),		        		
-		        		para = Array();
+			        	vm.set("start_date");		        	
 
-		        	//Dates
-		        	if(start && end){
-		            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
-		            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });            	            	
-		            }else if(start){
-		            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
-		            }else if(end){
-		            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
-		            }else{
-		            	
-		            }
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
 
-		            vm.loadData(para);	    		
-				});
+			            vm.loadData(para);		                      	    		
+					});
+
+					//Sale
+					$("#goSale").click(function(e){
+			        	e.preventDefault();
+
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
+			        	
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
+
+			            para.push({ field:"type", operator: "where_in", value: ["invoice","receipt"] });
+    					
+			            banhji.saleCenter.loadData(para);
+			            banhji.router.navigate('/sale_center');		                      	    		
+					});
+
+					//Unpaid
+					$("#goUnpaid").click(function(e){
+			        	e.preventDefault();
+
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
+			        	
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
+
+			            para.push({ field:"type", value: "invoice" });
+    					para.push({ field:"status", value: 0 });
+
+			            banhji.saleCenter.loadData(para);
+			            banhji.router.navigate('/sale_center');		                      	    		
+					});
+
+					//Invest
+					$("#goInvest").click(function(e){
+			        	e.preventDefault();
+
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
+			        	
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
+
+			            para.push({ field:"type", value: "invest" });
+    				
+			            banhji.saleCenter.loadData(para);
+			            banhji.router.navigate('/sale_center');		                      	    		
+					});
+
+					//Income
+					$("#goIncome").click(function(e){
+			        	e.preventDefault();
+
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
+			        	
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
+
+			            para.push({ field:"type", value: "income" });
+    				
+			            banhji.saleCenter.loadData(para);
+			            banhji.router.navigate('/sale_center');		                      	    		
+					});
+
+					//Bill
+					$("#goBill").click(function(e){
+			        	e.preventDefault();
+
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
+			        	
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
+
+			            para.push({ field:"type", value: "bill" });
+    				
+			            banhji.saleCenter.loadData(para);
+			            banhji.router.navigate('/sale_center');		                      	    		
+					});
+
+					//Unbill
+					$("#goUnbill").click(function(e){
+			        	e.preventDefault();
+
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
+			        	
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
+
+			            para.push({ field:"type", value: "bill" });
+			            para.push({ field:"status", value: 0 });
+    				
+			            banhji.saleCenter.loadData(para);
+			            banhji.router.navigate('/sale_center');		                      	    		
+					});
+
+					//Salary
+					$("#goSalary").click(function(e){
+			        	e.preventDefault();
+
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
+			        	
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
+
+			            para.push({ field:"type", value: "salray" });
+			               				
+			            banhji.saleCenter.loadData(para);
+			            banhji.router.navigate('/sale_center');		                      	    		
+					});
+
+					//Witdraw
+					$("#goWitdraw").click(function(e){
+			        	e.preventDefault();
+
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
+			        	
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
+
+			            para.push({ field:"type", value: "witdraw" });
+			               				
+			            banhji.saleCenter.loadData(para);
+			            banhji.router.navigate('/sale_center');		                      	    		
+					});
+
+					//Expense
+					$("#goExpense").click(function(e){
+			        	e.preventDefault();
+
+			        	var start = sdate.value(),
+			        		end = edate.value(),		        		
+			        		para = [];
+			        	
+			        	//Dates
+			        	if(start && end){
+			            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });			            	     	            	
+			            }else if(start){
+			            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+			            }else if(end){
+			            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+			            }else{
+			            	
+			            }
+
+			            para.push({ field:"type", value: "expense" });
+			               				
+			            banhji.saleCenter.loadData(para);
+			            banhji.router.navigate('/sale_center');		                      	    		
+					});
+				}
 			}								
 		}
 	});	
