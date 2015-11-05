@@ -540,7 +540,11 @@
         		#if(contact[0].contact_type_id=="5"){#
         			<a href="\#/contact/#=contact_id#"><i></i> #=contact[0].company#</a>
         		#}else{#
-        			<a href="\#/contact/#=contact_id#"><i></i> #=contact[0].surname# #=contact[0].name#</a>
+        			#if(contact[0].company!==""){#
+	        			<a href="\#/contact/#=contact_id#"><i></i> #=contact[0].company#</a>
+	        		#}else{#
+	        			<a href="\#/contact/#=contact_id#"><i></i> #=contact[0].surname# #=contact[0].name#</a>
+	        		#}#        			
         		#}#
         	#}#	
         </td>
@@ -959,7 +963,11 @@
 			#if(contact_type_id==5){#
 				#=company#
 			#}else{#
-				#=fullname#
+				#if(company!==""){#
+					#=company#
+				#}else{#
+					#=fullname#
+				#}#				
 			#}#
 		</td>
 		<td>#=memo#</td>
@@ -3718,7 +3726,20 @@
       		bill = this.get("bill");      		
       		
       		if(this.get("isEdit")){ //Update Bill
-      			this.update();	
+      			bill.set("issued_date", kendo.toString(bill.issued_date, "yyyy-MM-dd"));
+	      		bill.set("due_date", kendo.toString(bill.due_date, "yyyy-MM-dd"));
+
+	      		if(bill.contact_id!==contact.id){
+	      			bill.set("contact_id", contact.id);
+	      		}
+	      		this.updateStock();
+
+	      		this.dataSource.sync();
+	  			this.lineDS.sync();
+	  			this.contactDS.sync();
+
+	  			this.set("isEdit", false);  			
+	  			banhji.router.navigate('/sale_center');	
       		}else{
       			if(contact.id>0){ //New Bill With Existing Customer      				
       				bill.set("contact_id", contact.id);
@@ -3788,26 +3809,7 @@
 		      		}	
       			}      			
       		}      		
-      	},
-      	update 			: function(){
-      		var bill = this.get("bill"),
-      		contact = this.get("contact");      	
-
-      		bill.set("issued_date", kendo.toString(bill.issued_date, "yyyy-MM-dd"));
-      		bill.set("due_date", kendo.toString(bill.due_date, "yyyy-MM-dd"));
-
-      		if(bill.contact_id!==contact.id){
-      			bill.set("contact_id", contact.id);
-      		}
-      		this.updateStock();
-
-      		this.dataSource.sync();
-  			this.lineDS.sync();
-  			this.contactDS.sync();
-
-  			this.set("isEdit", false);  			
-  			banhji.router.navigate('/sale_center');  			
-      	},
+      	},      	
       	delete 			: function(){
 			if (confirm("តើលោកអ្នកពិតជាចង់លុបមែនឬទេ?")) {
 				var bill = this.get("bill");
