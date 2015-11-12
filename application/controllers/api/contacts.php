@@ -62,6 +62,7 @@ class Contacts extends REST_Controller {
 		    			$obj->like("number", $value["value"], "after");
 				    	$obj->or_like("surname", $value["value"], "after");
 				    	$obj->or_like("name", $value["value"], "after");
+				    	$obj->or_like("company", $value["value"], "after");
 		    		}else{
 		    			$obj->where($value["field"].' '.$value["operator"], $value["value"]);
 		    		}
@@ -96,6 +97,12 @@ class Contacts extends REST_Controller {
 				}
 				$bal->get();
 
+				//Fullname
+				$fullname = $value->surname.' '.$value->name;
+				if($value->contact_type_id==3 || $value->contact_type_id==5){
+					$fullname = $value->company;					
+				}
+
 		 		$data["results"][] = array(
 		 			"id" 				=> $value->id,											
 					"currency_id" 		=> $value->currency_id,
@@ -121,8 +128,8 @@ class Contacts extends REST_Controller {
 					"registered_date" 	=> $value->registered_date,
 					"deleted" 			=> $value->deleted,
 
-					"fullname" 			=> $value->surname.' '.$value->name,
-					"fullIdName"		=> $value->number.' '.$value->surname.' '.$value->name,
+					"fullname" 			=> $fullname,
+					"fullIdName"		=> $value->number.' '.$fullname,
 					"contact_type"		=> $value->contact_type->get_raw()->result(),
 					"balance" 			=> floatval($bal->amount)
 		 		);

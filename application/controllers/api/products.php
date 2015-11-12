@@ -59,7 +59,7 @@ class Products extends REST_Controller {
 		    		}else if($value["operator"]=="or_where"){
 		    			$obj->or_where($value["field"], $value["value"]);
 		    		}else if($value["operator"]=="by_vendor"){
-		    			$obj->where_related("contact", "id", $value["value"]);
+		    			$obj->where_related("stock", $value["field"], $value["value"]);
 		    		}else if($value["operator"]=="search"){
 		    			$obj->like("sku", $value["value"], "after");
 				    	$obj->or_like("name", $value["value"], "both");

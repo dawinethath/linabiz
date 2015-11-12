@@ -78,7 +78,7 @@ class bills extends REST_Controller {
 		$data["count"] = $obj->paged->total_rows;	
 
 		if($obj->result_count()>0){			
-			foreach ($obj as $value) {								
+			foreach ($obj as $value) {
 				$data["results"][] = array(
 					"id" 				=> $value->id,
 					"contact_id"		=> $value->contact_id,
@@ -101,6 +101,7 @@ class bills extends REST_Controller {
 				   	"issued_date" 		=> $value->issued_date,
 				   	"due_date" 			=> $value->due_date,
 				   	"paid_date" 		=> $value->paid_date,
+				   	"deliveried" 		=> $value->deliveried,
 				   	"deleted" 			=> $value->deleted,
 				   	
 				   	"contact" 			=> $value->contact->get_raw()->result(),
