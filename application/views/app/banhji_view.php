@@ -1817,7 +1817,7 @@
 				<span id="notification"></span>
 
 				<span id="save" class="btn btn-success btn-icon glyphicons ok_2"><i></i>រក្សាទុក</span>								
-				<span class="btn btn-inverse btn-icon glyphicons remove_2" data-bind="click: cancelChanges"><i></i>បិទ</span>
+				<span class="btn btn-inverse btn-icon glyphicons remove_2" data-bind="click: cancel"><i></i>បិទ</span>
 			</div>
 		</div>		
 	</div>
@@ -2798,7 +2798,7 @@
             }
         }
     });
-
+	
 	banhji.saleCenter =  kendo.observable({    	
     	dataSource 		: dataStore(baseUrl + "bills"),
     	outstandingDS 	: dataStore(baseUrl + "bills/outstanding"),
@@ -3874,9 +3874,14 @@
 	      				$.each(self.lineDS.data(), function(index, value){
 	      					value.set("bill_id", data.data[0].id);
 	      				});
+	      				
 	      				self.lineDS.sync();
+	      				var lineLoaded = false;
 	      				self.lineDS.bind("requestEnd", function(e){
-	      					self.clear();
+	      					if(lineLoaded==false){
+	      						lineLoaded = true;
+	      						self.clear();
+	      					}
 	      				});
 	      			});	
       			}else{
@@ -3896,8 +3901,12 @@
 		      				});	      				
 
 		      				self.lineDS.sync();
+		      				var lineLoaded = false;
 		      				self.lineDS.bind("requestEnd", function(e){
-								self.clear();
+								if(lineLoaded==false){
+		      						lineLoaded = true;
+		      						self.clear();
+		      					}
 							});	      				
 		      			});		      		
 		      		}else{ //New Bill With New Customer		      			
@@ -3920,8 +3929,12 @@
 			      				});	      				
 
 			      				self.lineDS.sync();
+			      				var lineLoaded = false;
 			      				self.lineDS.bind("requestEnd", function(e){
-									self.clear();
+									if(lineLoaded==false){
+			      						lineLoaded = true;
+			      						self.clear();
+			      					}
 								});	      				
 			      			});
 			      		});
@@ -4158,19 +4171,19 @@
 
       		this.autoIncreaseNo();	      	
       	},
-      	payAll 		: function(){
+      	payAll 			: function(){
       		var bill = this.get("obj");
 
       		bill.set("paid_usd", bill.amount);
       		this.onChange();
       	},
-      	save 			: function(){
-      		var self = this;
-
-      		this.dataSource.sync();
-      		this.dataSource.bind("requestEnd", function(e){
-      			window.history.back();
-      		});
+      	save 			: function(){      		
+      		this.dataSource.sync();      		
+      		window.history.back(); 
+      	},
+      	cancel 			: function(){
+      		this.dataSource.cancelChanges();
+      		window.history.back();
       	}
     });
     banhji.invoicePrint =  kendo.observable({    	
@@ -4724,9 +4737,9 @@
 		if(!auth.getLogin()){
 			banhji.router.navigate('/login');
 		}else{
-			// if(banhji.pageLoaded["sale_center"]==undefined){
-			// 	banhji.router.navigate('/sale_center');
-			// }else{
+			if(banhji.pageLoaded["sale_center"]==undefined){
+				banhji.router.navigate('/sale_center');
+			}else{
 				var vm = banhji.payment;
 				banhji.view.layout.showIn("#content", banhji.view.payment);
 
@@ -4754,7 +4767,7 @@
 				        }		            
 					});				
 				}
-			//}								
+			}								
 		}
 	});	
 	banhji.router.route("/invoice_print(/:id)", function(id){
