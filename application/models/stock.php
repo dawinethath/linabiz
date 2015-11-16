@@ -12,11 +12,7 @@ class Stock extends DataMapper {
 		'currency' => array(
 			'class' => 'currency',
 			'other_field' => 'stock'
-		),
-		'contact' => array(
-			'class' => 'contact',
-			'other_field' => 'stock'
-		),
+		),		
 		'product' => array(
 			'class' => 'product',
 			'other_field' => 'stock'
