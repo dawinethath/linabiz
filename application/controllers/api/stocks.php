@@ -79,8 +79,8 @@ class Stocks extends REST_Controller {
 		$obj->get_paged_iterated($page, $limit);
 		$data["count"] = $obj->paged->total_rows;								
 
-		if($obj->result_count()>0){			
-			foreach ($obj as $value) {							
+		if($obj->result_count()>0){
+			foreach ($obj as $value) {
 				$data["results"][] = array(
 					"id" 			=> $value->id,					
 					"currency_id"	=> $value->currency_id,
@@ -93,7 +93,7 @@ class Stocks extends REST_Controller {
 					"issued_date" 	=> $value->issued_date,
 					"deleted" 		=> $value->deleted,
 
-					"currency"		=> $value->currency->get_raw()->result(),
+					"currency"		=> $value->currency->get_raw()->result(),					
 					"contact"		=> $value->contact->get_raw()->result(),
 					"product"		=> $value->product->get_raw()->result(),
 					"unit"			=> $value->unit->get()->name

@@ -849,8 +849,7 @@
 			            	<th>ក្រុមហ៊ុន</th>	                
 			                <th>មុខទំនិញ</th>
 			                <th>ពណ៌នា</th>
-			                <th>ចំនួន</th>
-			                <th>ឯកត្តា</th>
+			                <th>ចំនួន</th>			                
 			                <th>តំលៃ</th>
 			                <th>ទឹកប្រាក់</th>			                	                
 			            </tr>
@@ -884,17 +883,17 @@
     	<td>#=kendo.toString(new Date(issued_date), "dd-MM-yyyy")#</td>
     	<td>#=contact[0]==null?"":contact[0].company#</td>
     	<td>#=product[0].name#</td>
-    	<td>#=product[0].description#</td>
+    	<td>#=product[0].description#</td>    	
     	<td>
     		#if(quantity>0){#
     			<span class="label label-success">#=quantity#</span>    			
     		#}else{#
     			<span class="label label-important">#=quantity#</span>
     		#}#
-    	</td>
-    	<td>#=unit#</td>    	
-    	<td>#=kendo.toString(price, "c", currency[0].locale)#</td>
-    	<td>#=kendo.toString(quantity*price, "c", currency[0].locale)#</td>    	
+    		/ #=unit#
+    	</td>    	    	
+    	<td class="right">#=kendo.toString(price, "c", currency[0].locale)#</td>
+    	<td class="right">#=kendo.toString(quantity*price, "c", currency[0].locale)#</td>    	
     </tr>
 </script>
 
@@ -3136,7 +3135,9 @@
     				{ field:"product_id", value: id },
     				{ field:"quantity >", value: -1 }
     			],
-    			sort: { field: "issued_date", dir: "desc" }
+    			sort: { field: "issued_date", dir: "desc" },
+    			page: 1,
+    			pageSize: 50
     		});    		
     		this.loadProduct(id);
     	},
