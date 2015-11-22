@@ -102,16 +102,16 @@ class Products extends REST_Controller {
 				}
 
 				$cost = array();
-				foreach ($value->stock->order_by("issued_date", "desc")->get() as $c) {
-					$cost = array(
-						"id" 		=> $c->id,
-						"quantity" 	=> floatval($c->quantity),
-						"price" 	=> floatval($c->price),
+				// foreach ($value->stock->order_by("issued_date", "desc")->get() as $c) {
+				// 	$cost = array(
+				// 		"id" 		=> $c->id,
+				// 		"quantity" 	=> floatval($c->quantity),
+				// 		"price" 	=> floatval($c->price),
 
-						"locale"	=> $c->currency->get()->locale,
-						"unit" 		=> $c->unit->get()->name
-					);
-				}
+				// 		"locale"	=> $c->currency->get()->locale,
+				// 		"unit" 		=> $c->unit->get()->name
+				// 	);
+				// }
 							
 				$data["results"][] = array(
 					"id" 			=> $value->id,					

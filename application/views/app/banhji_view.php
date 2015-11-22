@@ -851,7 +851,8 @@
 			                <th>ពណ៌នា</th>
 			                <th>ចំនួន</th>
 			                <th>ឯកត្តា</th>
-			                <th>តំលៃ</th>			                	                
+			                <th>តំលៃ</th>
+			                <th>ទឹកប្រាក់</th>			                	                
 			            </tr>
 			        </thead>
 			        <tbody data-template="stock-priceList-template"
@@ -892,7 +893,8 @@
     		#}#
     	</td>
     	<td>#=unit#</td>    	
-    	<td>#=kendo.toString(price, "c", currency[0].locale)#</td>    	
+    	<td>#=kendo.toString(price, "c", currency[0].locale)#</td>
+    	<td>#=kendo.toString(quantity*price, "c", currency[0].locale)#</td>    	
     </tr>
 </script>
 
@@ -2336,7 +2338,7 @@
 				serverPaging: true,
 				serverSorting: true,
 				page: 1,
-				pageSize: 100
+				pageSize: 50
 			});
 		return o;
 	};
