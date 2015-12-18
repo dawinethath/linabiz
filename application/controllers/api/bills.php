@@ -622,6 +622,130 @@ class bills extends REST_Controller {
 		$this->response($data, 200);
 	}
 
+	//RECORD GET	
+	function stock_get() {		
+		$filters 	= $this->get("filter")["filters"];		
+		$page 		= $this->get('page') !== false ? $this->get('page') : 1;		
+		$limit 		= $this->get('limit') !== false ? $this->get('limit') : 100;								
+		$sort 	 	= $this->get("sort");		
+		$data["results"] = array();
+		$data["count"] = 0;
+
+		$obj = new Bill_line(null, $this->entity);		
+
+		//Sort
+		if(!empty($sort) && isset($sort)){					
+			foreach ($sort as $value) {
+				$obj->order_by($value["field"], $value["dir"]);
+			}
+		}
+		
+		//Filter		
+		if(!empty($filters) && isset($filters)){			
+	    	foreach ($filters as $value) {
+	    		if(!empty($value["operator"]) && isset($value["operator"])){
+		    		if($value["operator"]=="where_in"){
+		    			$obj->where_in($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="or_where_in"){
+		    			$obj->or_where_in($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="where_not_in"){
+		    			$obj->where_not_in($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="or_where_not_in"){
+		    			$obj->or_where_not_in($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="like"){
+		    			$obj->like($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="or_like"){
+		    			$obj->or_like($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="not_like"){
+		    			$obj->not_like($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="or_not_like"){
+		    			$obj->or_not_like($value["field"], $value["value"]);
+		    		}else if($value["operator"]=="startswith"){
+		    			$obj->like($value["field"], $value["value"], "after");
+		    		}else if($value["operator"]=="endswith"){
+		    			$obj->like($value["field"], $value["value"], "before");
+		    		}else if($value["operator"]=="contains"){
+		    			$obj->like($value["field"], $value["value"], "both");
+		    		}else if($value["operator"]=="or_where"){
+		    			$obj->or_where($value["field"], $value["value"]);		    			    		
+		    		}else{
+		    			$obj->where($value["field"].' '.$value["operator"], $value["value"]);
+		    		}
+	    		}else{	    			
+	    			$obj->where($value["field"], $value["value"]);	    				    			
+	    		}
+			}									 			
+		}		
+
+		//Results
+		if(!empty($limit) && !empty($page)){
+			$obj->get_paged_iterated($page, $limit);
+			$data["count"] = $obj->paged->total_rows;							
+		}
+		if($obj->result_count()>0){			
+			foreach ($obj as $value) {
+				$pl = new Price_list(null, $this->entity);				
+				if($value->product_id>0){
+					$pl->get_by_product_id($value->product_id);
+
+					$priceList = [];
+					foreach ($pl as $p) {
+						$priceList[] = array(
+							"id" 			=> $p->id,
+							"currency_id" 	=> $p->currency_id,
+							"product_id" 	=> $p->product_id,
+							"unit_id" 		=> $p->unit_id,
+							"price" 		=> floatval($p->price),
+							"unit_value" 	=> floatval($p->unit_value),
+
+							"locale" 		=> $p->currency->get()->locale,
+							"unit" 			=> $p->unit->get()->name
+						);
+					}
+				}else{
+					$un = new Unit(null, $this->entity);
+					$un->get();
+
+					$priceList = [];
+					foreach ($un as $u) {
+						$priceList[] = array(
+							"id" 			=> $u->id,
+							"currency_id" 	=> 0,
+							"product_id" 	=> 0,
+							"unit_id" 		=> $u->id,
+							"price" 		=> 0,
+							"unit_value" 	=> 0,
+
+							"currency" 		=> "km-KH",
+							"unit" 			=> $u->name
+						);
+					}
+				}				
+
+				$data["results"][] = array(
+					"id" 			=> $value->id,
+					"bill_id" 		=> $value->bill_id,					
+					"unit_id" 		=> $value->unit_id,
+					"currency_id" 	=> $value->currency_id,
+					"product_id" 	=> $value->product_id,						
+					"description" 	=> $value->description,
+					"quantity" 		=> floatval($value->quantity),
+					"price"  		=> floatval($value->price),
+					"amount" 		=> floatval($value->amount),
+					"rate" 			=> floatval($value->rate),
+
+					"product" 		=> $value->product->get_raw()->result(),
+					"unit" 			=> $value->unit->get_raw()->result(),
+					"currency" 		=> $value->currency->get_raw()->result(),
+					"priceList" 	=> $priceList
+				);
+			}
+		}		
+
+		//Response Data		
+		$this->response($data, 200);	
+	}
+
 	//GET OUTSTANDING
 	function outstanding_get(){
 		$filters 	= $this->get("filter")["filters"];		

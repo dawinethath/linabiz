@@ -81,10 +81,18 @@ class Stocks extends REST_Controller {
 
 		if($obj->result_count()>0){
 			foreach ($obj as $value) {
+				//Fullname
+				$c = new Contact(null, $this->entity);
+				$c = $value->contact->get();
+				$fullname = $c->surname.' '.$c->name;
+				if($c->contact_type_id==3 || $c->contact_type_id==5){
+					$fullname = $c->company;					
+				}
+
 				$data["results"][] = array(
 					"id" 			=> $value->id,					
 					"currency_id"	=> $value->currency_id,
-					"reference_id"	=> $value->reference_id,
+					"bill_id"		=> $value->bill_id,
 					"contact_id"	=> $value->contact_id,
 					"product_id" 	=> $value->product_id,
 					"unit_id" 		=> $value->unit_id,						
@@ -93,8 +101,9 @@ class Stocks extends REST_Controller {
 					"issued_date" 	=> $value->issued_date,
 					"deleted" 		=> $value->deleted,
 
-					"currency"		=> $value->currency->get_raw()->result(),					
-					"contact"		=> $value->contact->get_raw()->result(),
+					"currency"		=> $value->currency->get_raw()->result(),
+					"bill" 			=> $value->bill->get_raw()->result(),					
+					"fullname"		=> $fullname,
 					"product"		=> $value->product->get_raw()->result(),
 					"unit"			=> $value->unit->get()->name
 				);
@@ -112,7 +121,7 @@ class Stocks extends REST_Controller {
 		foreach ($models as $value) {
 			$obj = new Stock(null, $this->entity);
 			$obj->currency_id 	= $value->currency_id;
-			$obj->reference_id 	= $value->reference_id;
+			$obj->bill_id 		= $value->bill_id;
 			$obj->contact_id 	= $value->contact_id;
 			$obj->product_id 	= $value->product_id;			
 			$obj->unit_id 		= $value->unit_id;
@@ -135,7 +144,7 @@ class Stocks extends REST_Controller {
 				$data["results"][] = array(
 					"id" 			=> $obj->id,
 					"currency_id"	=> $obj->currency_id,
-					"reference_id"	=> $obj->reference_id,
+					"bill_id"		=> $obj->bill_id,
 					"contact_id"	=> $obj->contact_id,
 					"product_id" 	=> $obj->product_id,					
 					"unit_id"		=> $obj->unit_id, 		
@@ -167,7 +176,7 @@ class Stocks extends REST_Controller {
 			$obj->get_by_id($value->id);
 
 			$obj->currency_id 	= $value->currency_id;
-			$obj->reference_id 	= $value->reference_id;
+			$obj->bill_id 		= $value->bill_id;
 			$obj->contact_id 	= $value->contact_id;
 			$obj->product_id 	= $value->product_id;			
 			$obj->unit_id 		= $value->unit_id;
@@ -181,7 +190,7 @@ class Stocks extends REST_Controller {
 				$data["results"][] = array(
 					"id" 			=> $obj->id,
 					"currency_id"	=> $obj->currency_id,
-					"reference_id"	=> $obj->reference_id,
+					"bill_id"		=> $obj->bill_id,
 					"contact_id"	=> $obj->contact_id,
 					"product_id" 	=> $obj->product_id,					
 					"unit_id"		=> $obj->unit_id, 		

@@ -13,8 +13,10 @@
 		      	<li class="active"><a href="#/sale_center">គេហទំព័រ</a></li>
 		      	<li><a href="#/contact_center">អតិថិជន</a></li>
 		      	<li><a href="#/products">ទំនិញ</a></li>
-		      	<li><a href="#/bills">វិក្កយបត្រ</a></li>		      	
-		      	<li><a href="#/sale_summary">របាយការណ៍</a></li>		      	
+		      	<li><a href="#/bills">វិក្កយបត្រ</a></li>
+		      	<li><a href="#/stock_center">ស្តុក</a></li>		      	
+		      	<li><a href="#/sale_summary">របាយការណ៍</a></li>
+		      	<li><a href="#/rInvoice_print">បន្ទប់</a></li>		      	
 		    </ul>
 	  	</div>
 	</div>  
@@ -840,7 +842,28 @@
 			        	data-bind="source: dataSource"></tbody>
 			    </table>
 
-				<br>
+				<p>
+					*ចំណាំ:<br>
+
+					- 1T = 1T <br>
+					- 1T = 20B <br>
+					- 1T = 1000Kg <br><br>
+
+					- 1B = 0.05T <br>
+					- 1B = 1B <br>
+					- 1B = 50Kg <br><br>
+
+					- 1Kg = 0.001T <br>
+					- 1Kg = 0.02B <br>
+					- 1Kg = 1Kg
+				</p>
+
+				<p>					
+					ធំជាង​ គុណ <br>
+					តូចជាង ចែក <br>
+					Example ធំ ទៅ តូច: T > B => 1*20 = 20 <br>
+					Example តូច ទៅ ធំ: B < T => 1/20 = 0.05
+				</p>
 
 				<table class="table table-bordered table-condensed">
 			        <thead>
@@ -881,7 +904,7 @@
 <script id="stock-priceList-template" type="text/x-kendo-template">
     <tr>    	
     	<td>#=kendo.toString(new Date(issued_date), "dd-MM-yyyy")#</td>
-    	<td>#=contact[0]==null?"":contact[0].company#</td>
+    	<td>#=fullname#</td>
     	<td>#=product[0].name#</td>
     	<td>#=product[0].description#</td>    	
     	<td>
@@ -889,10 +912,9 @@
     			<span class="label label-success">#=quantity#</span>    			
     		#}else{#
     			<span class="label label-important">#=quantity#</span>
-    		#}#
-    		/ #=unit#
+    		#}#    		
     	</td>    	    	
-    	<td class="right">#=kendo.toString(price, "c", currency[0].locale)#</td>
+    	<td class="right">#=kendo.toString(price, "c", currency[0].locale)#​ / #=unit#</td>
     	<td class="right">#=kendo.toString(quantity*price, "c", currency[0].locale)#</td>    	
     </tr>
 </script>
@@ -1349,6 +1371,68 @@
         visibility: hidden;
     }
 </style>
+
+<script id="stockCenter" type="text/x-kendo-template">
+	<h3>ស្តុក</h3>
+
+	<div>
+		<input data-role="dropdownlist"                   
+	           data-value-primitive="true"
+	           data-text-field="text"
+	           data-value-field="value"
+	           data-bind="value: sorter,
+	                      source: sortList,                              
+	                      events: { change: sorterChanges }" />
+
+		<input data-role="datepicker"
+			   data-format="dd-MM-yyyy"
+	           data-bind="value: sdate,
+	                      events: { change: dateChanges }" >
+
+	    <input data-role="datepicker"
+	    	   data-format="dd-MM-yyyy"
+	           data-bind="value: edate,
+	                      events: { change: dateChanges }" >
+	    
+	    <button type="button" data-role="button" data-icon="search" data-bind="click: search"></button>
+	</div>
+
+	<div data-role="grid" 
+			data-bind="source: dataSource"
+			data-pageable="true"
+			data-auto-bind="false"		           
+		    data-row-template="stock-center-row-template"						                           
+		    data-columns='[
+		    	{ title: "ល.រ", width: 45 },				       	
+		        { title: "កាលបរិច្ឆេទ" },	                     
+		        { title: "ក្រុមហ៊ុន" },
+		        { title: "មុខទំនិញ" },
+		        { title: "ពណ៌នា" },
+		        { title: "ចំនួន" },	            
+		        { title: "តំលៃ" },
+		        { title: "ទឹកប្រាក់" }			                           	                    
+		    ]'></div>
+</script>
+<script id="stock-center-row-template" type="text/x-kendo-template">
+    <tr>
+    	<td class="sno">1</td>    	
+    	<td>#=kendo.toString(new Date(issued_date), "dd-MM-yyyy")#</td>
+    	<td><a href="\#/bills/#=bill_id#">#=fullname#</a></td>
+    	<td>#=product[0].name#</td>
+    	<td>#=product[0].description#</td>    	
+    	<td>
+    		#if(quantity>0){#
+    			<span class="label label-success">#=quantity#</span>    			
+    		#}else{#
+    			<span class="label label-important">#=quantity#</span>
+    		#}#
+    		/ #=unit#    		
+    	</td>    	    	
+    	<td class="right">#=kendo.toString(price, "c", currency[0].locale)#​</td>
+    	<td class="right">#=kendo.toString(quantity*price, "c", currency[0].locale)#</td>    	
+    </tr>
+</script>
+
 <script id="newStock" type="text/x-kendo-template">
 	<div class="container-960">
 		<div id="example" class="k-content">
@@ -2965,6 +3049,102 @@
 			banhji.router.navigate('/sale_center');	
 		}
     });
+	banhji.stockCenter = kendo.observable({
+		dataSource 			: dataStore(baseUrl + "stocks"),
+		
+		sortList			: [ 
+	 		{ text:"ទាំងអស់", value: "all" }, 
+	 		{ text:"ថ្ងៃនេះ", value: "today" }, 
+	 		{ text:"សប្ដាស៍នេះ", value: "week" }, 
+	 		{ text:"ខែនេះ", value: "month" }, 
+	 		{ text:"ឆ្នាំនេះ", value: "year" } 
+		],
+		sorter 				: "year",
+		sdate 				: "",
+		edate 				: "",		
+				
+		pageLoad 			: function(){
+			this.search();			
+		},
+		sorterChanges 		: function(){
+			var value = this.get("sorter");
+
+			switch(value){
+			case "today":
+				var today = new Date();
+				
+				this.set("sdate", today);
+				this.set("edate", "");
+			  					
+			  	break;
+			case "week":
+			  	var thisWeek = new Date;
+				var first = thisWeek.getDate() - thisWeek.getDay(); 
+				var last = first + 6;
+
+				var firstDayOfWeek = new Date(thisWeek.setDate(first));
+				var lastDayOfWeek = new Date(thisWeek.setDate(last));				
+
+				this.set("sdate", firstDayOfWeek);
+				this.set("edate", lastDayOfWeek);
+				
+			  	break;
+			case "month":
+				var thisMonth = new Date;				  	
+				var firstDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth(), 1);
+				var lastDayOfMonth = new Date(thisMonth.getFullYear(), thisMonth.getMonth() + 1, 0);
+
+				this.set("sdate", firstDayOfMonth);
+				this.set("edate", lastDayOfMonth);
+
+			  	break;
+			case "year":
+				var thisYear = new Date();
+			  	var firstDayOfYear = new Date(thisYear.getFullYear(), 0, 1);
+				var lastDayOfYear = new Date(thisYear.getFullYear(), 11, 31);
+
+				this.set("sdate", firstDayOfYear);
+				this.set("edate", lastDayOfYear);
+
+			  	break;
+			default:
+				this.set("sdate", "");
+				this.set("edate", "");					  
+			}
+		},
+		autoIncreaseNo 		: function(){
+			$(".sno").each(function(index,element){                 
+			   $(element).text(index + 1); 
+			});
+		},
+		search 				: function(){
+			var self = this,
+				start = kendo.toString(this.get("sdate"), "yyyy-MM-dd"),
+        		end = kendo.toString(this.get("edate"), "yyyy-MM-dd"),	        		
+        		para = [];
+
+        	//Dates
+        	if(start && end){
+            	para.push({ field:"issued_date >=", value: kendo.toString(start, "yyyy-MM-dd") });
+            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });            	            	
+            }else if(start){
+            	para.push({ field:"issued_date", value: kendo.toString(start, "yyyy-MM-dd") });
+            }else if(end){
+            	para.push({ field:"issued_date <=", value: kendo.toString(end, "yyyy-MM-dd") });
+            }else{
+            	
+            }
+
+            this.dataSource.query({
+            	filter: para,
+            	sort: { field: "issued_date", dir: "desc" },
+            	page: 1,
+            	pageSize: 50
+            }).then(function(){
+            	self.autoIncreaseNo();
+            });            
+		}		
+	});
 
 	banhji.contact = kendo.observable({		
 		dataSource 	: dataStore(baseUrl + "contacts"),
@@ -3367,7 +3547,7 @@
       		if(this.dataSource.total()==0){
 	      		this.dataSource.add({      			
 	      			currency_id 	: 1,
-	      			reference_id 	: 0,
+	      			bill_id 		: 0,
 	      			contact_id 		: 0,
 	      			product_id 		: this.get("product_id"),
 	      			unit_id 		: 0,
@@ -3513,7 +3693,7 @@
 	      		self.autoIncreaseNo();	    		    			    	
 			});
 
-			this.stockDS.filter({ field:"reference_id", value: id });
+			this.stockDS.filter({ field:"bill_id", value: id });
     	},
     	loadContact		: function(id){
     		var self = this,
@@ -3576,7 +3756,7 @@
 		      			contact_id 		: 0,
 		      			biller_id 		: 0,      			
 		      			currency_id 	: 1,
-		      			reference_id 	: 0,
+		      			bill_id 		: 0,
 		      			type 			: "invoice",
 		      			number 			: "",
 		      			amount 		 	: 0,	      			
@@ -3977,7 +4157,7 @@
 					if(value.id===""){
 						self.stockDS.add({      			
 			      			currency_id 	: value.currency_id,
-			      			reference_id	: bill.id,
+			      			bill_id			: bill.id,
 			      			contact_id 		: 0,
 			      			product_id 		: value.product_id,
 			      			unit_id 		: value.unit_id,
@@ -4026,7 +4206,7 @@
       			if(value.product_id>0){
 					self.stockDS.add({      			
 		      			currency_id 	: value.currency_id,
-		      			reference_id	: bill_id,
+		      			bill_id			: bill_id,
 		      			contact_id 		: bill.contact_id,
 		      			product_id 		: value.product_id,
 		      			unit_id 		: value.unit_id,
@@ -4329,6 +4509,7 @@
 		rInvoicePrint: new kendo.View("#rInvoicePrint", {model: banhji.rInvoicePrint}),
 		contact: new kendo.View("#contact", {model: banhji.contact}),
 		contactCenter: new kendo.View("#contactCenter", {model: banhji.contactCenter}),
+		stockCenter: new kendo.View("#stockCenter", {model: banhji.stockCenter}),
 
 		newProduct: new kendo.View("#newProduct", {model: banhji.newProduct}),
 		priceList: new kendo.View("#priceList", {model: banhji.priceList}),
@@ -4508,7 +4689,7 @@
 			}											
 		}
 	});
-	banhji.router.route("/contact_center", function(id){
+	banhji.router.route("/contact_center", function(){
 		if(!auth.getLogin()){
 			banhji.router.navigate('/login');
 		}else{
@@ -4641,6 +4822,25 @@
 					vm.vendorDS.filter({ field:"contact_type_id", value: 5 });
 				}
 			}	
+		}
+	});
+	banhji.router.route("/stock_center", function(){
+		if(!auth.getLogin()){
+			banhji.router.navigate('/login');
+		}else{
+			// if(banhji.pageLoaded["sale_center"]==undefined){
+			// 	banhji.router.navigate('/sale_center');
+			// }else{
+				var vm = banhji.stockCenter;
+				
+				banhji.view.layout.showIn("#content", banhji.view.stockCenter);				
+				
+				if(banhji.pageLoaded["stock_center"]==undefined){
+					banhji.pageLoaded["stock_center"] = true;					
+
+					vm.pageLoad();
+				}
+			//}	
 		}
 	});
 	banhji.router.route("/new_stock/:id", function(id){

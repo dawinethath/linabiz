@@ -20,6 +20,10 @@ class Stock extends DataMapper {
 		'unit' => array(
 			'class' => 'unit',
 			'other_field' => 'stock'
+		),
+		'bill' => array(
+			'class' => 'bill',
+			'other_field' => 'stock'
 		)
 	);
 	

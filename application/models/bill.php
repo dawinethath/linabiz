@@ -19,6 +19,10 @@ class Bill extends DataMapper {
 		'bill_line' => array(
 			'class' => 'bill_line',
 			'other_field' => 'bill'
+		),
+		'stock' => array(
+			'class' => 'stock',
+			'other_field' => 'bill'
 		)
 	);
 	
