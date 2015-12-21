@@ -487,52 +487,50 @@ class bills extends REST_Controller {
 			$obj->price			= $value->price;
 			$obj->amount		= $value->amount;
 			$obj->rate 			= $value->rate;
-			$obj->checkout 		= isset($value->checkout)?$value->checkout:0;
-
-			$data["results"] = $obj->save();
+			$obj->checkout 		= isset($value->checkout)?$value->checkout:0;			
 						
-			// if($obj->save()){
-			// 	$pl = new Price_list(null, $this->entity);				
-			// 	if($obj->unit_id>0){
-			// 		$pl = $pl->get_by_id($obj->unit_id);
-			// 	}else{
-			// 		$pl = $pl->get();
-			// 	}
+			if($obj->save()){
+				$pl = new Price_list(null, $this->entity);				
+				if($obj->unit_id>0){
+					$pl = $pl->get_by_id($obj->unit_id);
+				}else{
+					$pl = $pl->get();
+				}
 
-			// 	$priceList = [];
-			// 	foreach ($pl as $p) {
-			// 		$priceList[] = array(
-			// 			"id" 			=> $p->id,
-			// 			"currency_id" 	=> $p->currency_id,
-			// 			"product_id" 	=> $p->product_id,
-			// 			"unit_id" 		=> $p->unit_id,
-			// 			"price" 		=> floatval($p->price),
-			// 			"unit_value" 	=> floatval($p->unit_value),
+				$priceList = [];
+				foreach ($pl as $p) {
+					$priceList[] = array(
+						"id" 			=> $p->id,
+						"currency_id" 	=> $p->currency_id,
+						"product_id" 	=> $p->product_id,
+						"unit_id" 		=> $p->unit_id,
+						"price" 		=> floatval($p->price),
+						"unit_value" 	=> floatval($p->unit_value),
 
-			// 			"currency" 		=> $p->currency->get_raw()->result(),
-			// 			"unit" 			=> $p->unit->get_raw()->result()
-			// 		);
-			// 	}
+						"currency" 		=> $p->currency->get_raw()->result(),
+						"unit" 			=> $p->unit->get_raw()->result()
+					);
+				}
 
-			// 	$data["results"][] = array(
-			// 		"id" 			=> $obj->id,
-			// 		"bill_id" 		=> $obj->bill_id,					
-			// 		"unit_id" 		=> $obj->unit_id,
-			// 		"currency_id" 	=> $obj->currency_id,
-			// 		"product_id" 	=> $obj->product_id,						
-			// 		"description" 	=> $obj->description,
-			// 		"quantity" 		=> floatval($obj->quantity),
-			// 		"price"  		=> floatval($obj->price),
-			// 		"amount" 		=> floatval($obj->amount),
-			// 		"rate" 			=> floatval($obj->rate),
-			// 		"checkout" 		=> floatval($obj->checkout),
+				$data["results"][] = array(
+					"id" 			=> $obj->id,
+					"bill_id" 		=> $obj->bill_id,					
+					"unit_id" 		=> $obj->unit_id,
+					"currency_id" 	=> $obj->currency_id,
+					"product_id" 	=> $obj->product_id,						
+					"description" 	=> $obj->description,
+					"quantity" 		=> floatval($obj->quantity),
+					"price"  		=> floatval($obj->price),
+					"amount" 		=> floatval($obj->amount),
+					"rate" 			=> floatval($obj->rate),
+					"checkout" 		=> floatval($obj->checkout),
 
-			// 		"product" 		=> $obj->product->get_raw()->result(),
-			// 		"unit" 			=> $obj->unit->get_raw()->result(),
-			// 		"currency" 		=> $obj->currency->get_raw()->result(),
-			// 		"priceList" 	=> $priceList				
-			// 	);				
-			// }		
+					"product" 		=> $obj->product->get_raw()->result(),
+					"unit" 			=> $obj->unit->get_raw()->result(),
+					"currency" 		=> $obj->currency->get_raw()->result(),
+					"priceList" 	=> $priceList				
+				);				
+			}		
 		}
 		$data["count"] = count($data["results"]);
 
