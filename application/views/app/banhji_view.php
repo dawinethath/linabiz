@@ -3755,7 +3755,7 @@
 		      		this.dataSource.add({      			
 		      			contact_id 		: 0,
 		      			biller_id 		: 0,      			
-		      			currency_id 	: 1,
+		      			currency_id 	: 1,		      			
 		      			bill_id 		: 0,
 		      			type 			: "invoice",
 		      			number 			: "",
@@ -3772,7 +3772,8 @@
 		      			status 			: "",      			
 		      			issued_date		: new Date(),
 		      			due_date 		: new Date(),
-		      			paid_date 		: ""	      			
+		      			paid_date 		: "",
+		      			delivered 		: 0	      			
 					});
 
 					var data = this.dataSource.data(),
@@ -3865,6 +3866,7 @@
       			price 			: 0,
       			amount 			: 0,
       			rate 			: 1,
+      			checkout 		: 0,
 
       			priceList 		: this.get("unitList")
       		});
@@ -4081,9 +4083,9 @@
 		      				//Line
 		      				$.each(self.lineDS.data(), function(index, value){
 		      					value.set("bill_id", data.data[0].id);
-		      				});	      				
+		      				});		     					      				
 
-		      				self.lineDS.sync();
+		       				self.lineDS.sync();
 		      				var lineLoaded = false;
 		      				self.lineDS.bind("requestEnd", function(e){
 								if(lineLoaded==false){
