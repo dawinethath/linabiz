@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'https://192.168.1.100/linabiz/';
+$config['base_url']	= 'https://127.0.0.1/linabiz/';
 
 /*
 |--------------------------------------------------------------------------

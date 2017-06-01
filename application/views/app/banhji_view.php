@@ -891,7 +891,7 @@
 </script>
 <script id="priceList-template" type="text/x-kendo-template">
     <tr>
-    	<td>#=kendo.toString(price, "c", currency[0].locale)#</td>    	
+    	<td>#=kendo.toString(price, "c", currency.length>0?currency[0].locale:"")#</td>    	
     	<td>#=unit_value#</td>
     	<td>#=unit#</td>    	
     	<td>
@@ -905,8 +905,8 @@
     <tr>    	
     	<td>#=kendo.toString(new Date(issued_date), "dd-MM-yyyy")#</td>
     	<td>#=fullname#</td>
-    	<td>#=product[0].name#</td>
-    	<td>#=product[0].description#</td>    	
+    	<td>#=product.length>0?product[0].name:""#</td>
+    	<td>#=product.length>0?product[0].description:""#</td>    	
     	<td>
     		#if(quantity>0){#
     			<span class="label label-success">#=quantity#</span>    			
@@ -1747,7 +1747,8 @@
 					data-format="n4" data-decimals="4" data-min="0"
 					data-bind="value: quantity, events: {change : onChange}" style="width: 100px;" />
 			<input data-role="dropdownlist"
-				   data-option-label="(---រើស---)"                   
+				   data-option-label="(---រើស---)"
+				   data-value-primitive="true"                   
                    data-text-field="unit"
                    data-value-field="unit_id"
                    data-bind="value: unit_id,
@@ -1759,9 +1760,10 @@
 			<input data-role="numerictextbox" 
 					data-format="n4" data-decimals="4" data-min="0"
 					data-bind="value: price, events: {change : onChange}" style="width: 100px;" />
-			<input data-role="dropdownlist"                   
+			<input data-role="dropdownlist"
+				   data-value-primitive="true"                   
                    data-text-field="code"
-                   data-value-field="id"
+                   data-value-field="id"                   
                    data-bind="value: currency_id,
                               source: currencyList"
                               style="width: 60px;" />
