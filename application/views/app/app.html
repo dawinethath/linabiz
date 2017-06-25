@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Happy Room</title>
+    <meta charset="utf-8">
+
+    <link href="../content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jszip.min.js"></script>
+    <script src="../../js/kendo.all.min.js"></script>
+    <script src="../content/shared/js/console.js"></script>
+    
+</head>
+<body>
+<div id="example" class="k-content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="no-print" align="center">
+
+                <div class="box wide">        
+                    <div class="box-col">
+                        <h4>Import</h4>
+                        <input id="files" name="files" 
+                                type="file"
+                                data-role="upload" 
+                                data-show-file-list="true" 
+                                data-bind="events: {select: onSelected}" />
+                    </div>
+                </div>
+
+                <button class="btn btn-icon btn-inverse" onclick="javascript:window.print()">បោះពុម្ព</button> |
+                <input type="checkbox" data-bind="click: printData" /> ប្រើក្រដាសពុម្ព |                    
+                <input type="checkbox" data-bind="click: printFrame" /> ពុម្ពក្រដាស 
+                
+                <br /><br />
+
+                <div id="pager" class="k-pager-wrap"
+                     data-role="pager" data-bind="source: dataSource"
+                     style="width: 510px;"></div>                                         
+            </div>               
+
+            <div align="center">
+                <div data-role="listview"
+                     data-template="rInvoice-print-template"
+                     data-bind="source: dataSource"                        
+                     style="width: 298px; border:none;"></div>
+            </div>
+        </div>
+    </div>
+    <style type="text/css">
+        @media print
+        {    
+            .no-print, .no-print *
+            {
+                display: none !important;
+            }
+        }
+    </style>
+
+    <script id="rInvoice-print-template" type="text/x-kendo-tmpl">
+        <br><br>    
+        <h3 class="hiddenPrint" align="center">វិក្កយបត្រ</h3>
+
+        <table width="100%">
+            <tr>
+                <td>បន្ទប់</td>
+                <td class="hiddenPrintFrame">
+                    #=room_number#
+                    -
+                    #=customer_name#
+                </td>
+                <td align="right">ប្រចាំខែ</td>
+                <td class="hiddenPrintFrame" align="right">#=kendo.toString(new Date(month_of), "MM-yyyy")#</td>
+            </tr>
+            <tr>
+                <td>ថ្ងៃចូល</td>
+                <td class="hiddenPrintFrame">#=kendo.toString(new Date(date_in), "dd-MM-yyyy")#</td>
+                <td align="right"></td>
+                <td align="right"></td>
+            </tr>
+        </table>
+
+        <br />
+
+        <table width="100%">
+            <thead style="border: 1px solid black;">
+                <tr class="hiddenPrint">
+                    <th>បរិយាយ</th>
+                    <th>អំនាន</th>
+                    <th>ចំនួន</th>
+                    <th>គិត</th>
+                    <th>តំលៃ</th>
+                    <th>ទឹកប្រាក់</th>
+                </tr>
+            </thead>
+            </tbody>
+                <tr></tr>
+                <tr class="hiddenPrintFrame">
+                    <td>ឈ្នួលបន្ទប់</td>
+                    <td></td>
+                    <td align="right">1</td>
+                    <td></td>
+                    <td align="right">#=kendo.toString(rental, 'c0')#</td>
+                    <td align="right">#=kendo.toString(rental, 'c0')#</td>
+                </tr>
+                <tr class="hiddenPrintFrame">
+                    <td>ថ្លៃទឹក</td>
+                    <td align="center">
+                        #=wfrom#
+                        -
+                        #=wto#
+                    </td>
+                    <td align="right">
+                        #=wqty# m<sup>3</sup>
+                    </td>
+                    <td align="right">
+                        #=wadd_on#
+                    </td>
+                    <td align="right">
+                        #=kendo.toString(wprice, 'c0', 'km-KH')#
+                    </td>
+                    <td align="right">
+                        #=kendo.toString(wamt, 'c0', 'km-KH')#
+                    </td>
+                </tr>            
+                #if(trash>0){#
+                <tr>
+                    <td>ថ្លៃសំរាម</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td align="right">
+                        #=kendo.toString(trash, 'c')#
+                    </td>
+                </tr>
+                #}#
+                #if(service>0){#
+                <tr>
+                    <td><span style="font-size:x-small;">សេវាបង់ប្រាក់</span></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td align="right">
+                        #=kendo.toString(service, 'c')#
+                    </td>
+                </tr>
+                #}#           
+            </tbody>          
+        </table>     
+        
+        <hr>
+
+        <div class="hiddenPrintFrame" align="right" style="font-size: medium;">សរុបៈ #=kendo.toString(total, 'c3')#</div> 
+
+        <div style="min-height: 70px;"></div>      
+
+        <footer data-bind="invisible: framePrint" style="font-size: x-small; margin-bottom:0px; page-break-after: always;">
+            <div class="hiddenprintframe">
+                <p class="hiddenPrint" align="left">
+                    *ចំណាំ៖ <br />
+                    - បើមិនចង់ស្នាក់នៅបន្តត្រូវទូទាត់ប្រាក់ឪ្យគ្រប់សំរាប់ខែចាស់ <br />
+                    - បើសិនជាស្នាក់នៅបន្តលើស​ 1​ ថ្ងៃនឹងត្រូវគិតតម្លៃ 1 ខែ <br />
+                    - បើឈប់ស្នាក់នៅត្រូវឪ្យដំណឹងមុន 1អាទិត្យនៃថ្ងៃចូលស្នាក់
+                </p>
+            </div>
+        </footer>   
+    </script>
+    
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jszip/2.4.0/jszip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+    <script>
+        $(document).ready(function() {
+            var viewModel = kendo.observable({
+                dataSource          : [],
+                framePrint          : false,
+                onSelected          : function(e){
+                    var self = this,
+                        files = e.files, 
+                        reader = new FileReader();
+
+                    reader.onload = function() {
+                        var data = reader.result,
+                            workbook = XLSX.read(data, {type : 'binary'});
+
+                        workbook.SheetNames.forEach(function(sheetName) {
+                            var roa = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+
+                            if(roa.length > 0 && sheetName=="rinvoices"){
+                                for(var i = 0; i < roa.length; i++) {
+                                    self.dataSource.push({
+                                        room_number: roa[i].room_number,
+                                        customer_name: roa[i].customer_name,
+                                        month_of: roa[i].month_of,
+                                        date_in: roa[i].date_in,
+                                        wfrom: roa[i].wfrom,
+                                        wto: roa[i].wto,
+                                        wqty: roa[i].wqty,
+                                        wadd_on: roa[i].wadd_on,
+                                        wprice: roa[i].wprice,
+                                        wamt: roa[i].wamt,
+                                        trash: roa[i].trash,
+                                        service: roa[i].service,
+                                        deposit: roa[i].deposit,
+                                        rental: roa[i].rental,
+                                        total: roa[i].total                                        
+                                    });   
+                                }
+                            }
+                        });
+                    }
+                    reader.readAsBinaryString(files[0].rawFile);
+                },
+                printData       : function(e) {
+                    var tar = e.target;
+                    if(tar.checked) {
+                        $(".hiddenPrint").css("visibility", "hidden");
+                    } else {
+                        $(".hiddenPrint").css("visibility", "visible");
+                    }
+                },
+                printFrame      : function(e) {
+                    var tar = e.target;
+                    if(tar.checked) {
+                        $(".hiddenPrintFrame").css("visibility", "hidden");
+                    } else {
+                        $(".hiddenPrintFrame").css("visibility", "visible");
+                    }
+                }
+            });
+
+            kendo.bind($("#example"), viewModel);
+        });
+    </script>
+
+</div>
+
+
+</body>
+</html>
