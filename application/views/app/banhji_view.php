@@ -1,5 +1,5 @@
 <div id="wrapperApplication" class="container-fluid"></div>
-
+ 
 <!-- template section starts -->
 <script type="text/x-kendo-template" id="layout">
 	<div id="menu-barr"></div>				
