@@ -4,15 +4,15 @@
     <title>Happy Room</title>
     <meta charset="utf-8">
 
-    <link href="../content/shared/styles/examples-offline.css" rel="stylesheet">
-    <link href="../../styles/kendo.common.min.css" rel="stylesheet">
-    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet">
-    <link href="../../styles/kendo.default.min.css" rel="stylesheet">
-    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet">
-    <script src="../../js/jquery.min.js"></script>
-    <script src="../../js/jszip.min.js"></script>
-    <script src="../../js/kendo.all.min.js"></script>
-    <script src="../content/shared/js/console.js"></script>
+    <link href="content/shared/styles/examples-offline.css" rel="stylesheet">
+    <link href="../styles/kendo.common.min.css" rel="stylesheet">
+    <link href="../styles/kendo.rtl.min.css" rel="stylesheet">
+    <link href="../styles/kendo.default.min.css" rel="stylesheet">
+    <link href="../styles/kendo.default.mobile.min.css" rel="stylesheet">
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/jszip.min.js"></script>
+    <script src="../js/kendo.all.min.js"></script>
+    <script src="content/shared/js/console.js"></script>
     
 </head>
 <body>
@@ -46,8 +46,8 @@
 
         <div data-role="listview"
              data-template="rInvoice-print-template"
-             data-bind="source: dataSource"                        
-             style="width: 298px; border:none;"></div>           
+             data-bind="source: dataSource"
+             style="width: 400px; border: 0px;"></div>           
     </div>
     <style type="text/css">
         @media print
@@ -55,141 +55,145 @@
             .no-print, .no-print *
             {
                 display: none !important;
+                height: 0 !important;
             }
         }
     </style>
 
     <script id="rInvoice-print-template" type="text/x-kendo-tmpl">
-        <h3 align="center">វិក្កយបត្រ</h3>
-        <br>
+        <div>
+            <br><br>
+            <h3 align="center">វិក្កយបត្រ</h3>
+            <br>
 
-        <table width="100%">
-            <tr>
-                <td>បន្ទប់</td>
-                <td>
-                    #=room#
-                    -
-                    #=name#
-                </td>
-                <td align="right">ប្រចាំខែ</td>
-                <td align="right">#=kendo.toString(new Date(month_of), "MM-yyyy")#</td>
-            </tr>
-            <tr>
-                <td>ថ្ងៃចូល</td>
-                <td>#=date_in#</td>
-                <td align="right"></td>
-                <td align="right"></td>
-            </tr>
-        </table>
-
-        <br />
-
-        <table width="100%">
-            <thead>
-                <tr style="border: 1px solid black;">
-                    <th>ពណ៌នា</th>
-                    <th>អំនាន</th>
-                    <th>ចំនួន</th>
-                    <th>គិត</th>
-                    <th>តំលៃ</th>
-                    <th>ទឹកប្រាក់</th>
-                </tr>
-            </thead>
-            </tbody>
-                <tr></tr>
+            <table width="100%">
                 <tr>
-                    <td><span style="font-size:x-small;">ឈ្នួលបន្ទប់</span></td>
-                    <td></td>
-                    <td align="right">1</td>
-                    <td></td>
-                    <td align="right">#=kendo.toString(rental, 'c0')#</td>
-                    <td align="right">#=kendo.toString(rental, 'c0')#</td>
-                </tr>
-                <tr>
-                    <td>ថ្លៃទឹក</td>
-                    <td align="center">
-                        #=wfrom#
+                    <td>បន្ទប់</td>
+                    <td>
+                        #=room#
                         -
-                        #=wto#
+                        #=name#
                     </td>
-                    <td align="right">
-                        #=wqty#
-                    </td>
-                    <td align="right">
-                        #=wadd#
-                    </td>
-                    <td align="right">
-                        #=kendo.toString(wprice, 'c0', 'km-KH')#
-                    </td>
-                    <td align="right">
-                        #=kendo.toString(wamt, 'c0', 'km-KH')#
-                    </td>
+                    <td align="right">ប្រចាំខែ</td>
+                    <td align="right">#=kendo.toString(new Date(month_of), "MM-yyyy")#</td>
                 </tr>
                 <tr>
-                    <td>ថ្លៃភ្លើង</td>
-                    <td align="center">
-                        <span style="font-size:small;">
-                        #=efrom#
-                        -
-                        #=eto#
-                        </span>
-                    </td>
-                    <td align="right">
-                        #=eqty#
-                    </td>
-                    <td align="right">
-
-                    </td>
-                    <td align="right">
-                        #=kendo.toString(eprice, 'c0', 'km-KH')#
-                    </td>
-                    <td align="right">
-                        #=kendo.toString(eamt, 'c0', 'km-KH')#
-                    </td>
-                </tr>            
-                #if(trash>0){#
-                <tr>
-                    <td>ថ្លៃសំរាម</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td align="right">
-                        #=kendo.toString(trash, 'c')#
-                    </td>
+                    <td>ថ្ងៃចូល</td>
+                    <td>#=date_in#</td>
+                    <td align="right"></td>
+                    <td align="right"></td>
                 </tr>
-                #}#
-                #if(service>0){#
-                <tr>
-                    <td><span style="font-size:x-small;">សេវាបង់ប្រាក់</span></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td align="right">
-                        #=kendo.toString(service, 'c')#
-                    </td>
-                </tr>
-                #}#           
-            </tbody>          
-        </table>     
-        
-        <hr>
+            </table>
 
-        <div align="right" style="font-size: large;">សរុបៈ #=kendo.toString(kendo.parseFloat(total), 'c3')#</div> 
+            <br />
 
-        <div style="min-height: 70px;"></div>      
+            <table width="100%">
+                <thead>
+                    <tr style="border: 1px solid black;">
+                        <th>ពណ៌នា</th>
+                        <th>អំនាន</th>
+                        <th>ចំនួន</th>
+                        <th>គិត</th>
+                        <th>តំលៃ</th>
+                        <th>ទឹកប្រាក់</th>
+                    </tr>
+                </thead>
+                </tbody>
+                    <tr></tr>
+                    <tr>
+                        <td><span style="font-size:small;">ឈ្នួលបន្ទប់</span></td>
+                        <td></td>
+                        <td align="right">1</td>
+                        <td></td>
+                        <td align="right">#=kendo.toString(rental, 'c0')#</td>
+                        <td align="right">#=kendo.toString(rental, 'c0')#</td>
+                    </tr>
+                    <tr>
+                        <td>ថ្លៃទឹក</td>
+                        <td align="center">
+                            #=wfrom#
+                            -
+                            #=wto#
+                        </td>
+                        <td align="right">
+                            #=wqty#
+                        </td>
+                        <td align="right">
+                            #=wadd#
+                        </td>
+                        <td align="right">
+                            #=kendo.toString(wprice, 'c0', 'km-KH')#
+                        </td>
+                        <td align="right">
+                            #=kendo.toString(wamt, 'c0', 'km-KH')#
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>ថ្លៃភ្លើង</td>
+                        <td align="center">
+                            <span style="font-size:small;">
+                            #=efrom#
+                            -
+                            #=eto#
+                            </span>
+                        </td>
+                        <td align="right">
+                            #=eqty#
+                        </td>
+                        <td align="right">
 
-        <footer style="font-size: x-small; margin-bottom:0px; page-break-after: always;">
-            <div>
-                <p align="left">
-                    *ចំណាំ៖ <br />
-                    - បើមិនចង់ស្នាក់នៅបន្តត្រូវទូទាត់ប្រាក់ឪ្យគ្រប់សំរាប់ខែចាស់ <br />
-                    - បើសិនជាស្នាក់នៅបន្តលើស​ 1​ ថ្ងៃនឹងត្រូវគិតតម្លៃ 1 ខែ <br />
-                    - បើឈប់ស្នាក់នៅត្រូវឪ្យដំណឹងមុន 1អាទិត្យនៃថ្ងៃចូលស្នាក់
-                </p>
-            </div>
-        </footer>
+                        </td>
+                        <td align="right">
+                            #=kendo.toString(eprice, 'c0', 'km-KH')#
+                        </td>
+                        <td align="right">
+                            #=kendo.toString(eamt, 'c0', 'km-KH')#
+                        </td>
+                    </tr>            
+                    #if(trash>0){#
+                    <tr>
+                        <td>ថ្លៃសំរាម</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td align="right">
+                            #=kendo.toString(trash, 'c')#
+                        </td>
+                    </tr>
+                    #}#
+                    #if(service>0){#
+                    <tr>
+                        <td><span style="font-size:x-small;">សេវាបង់ប្រាក់</span></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td align="right">
+                            #=kendo.toString(service, 'c')#
+                        </td>
+                    </tr>
+                    #}#           
+                </tbody>          
+            </table>     
+            
+            <hr>
+
+            <div align="right" style="font-size: large;">សរុបៈ #=kendo.toString(kendo.parseFloat(total), 'c3')#</div> 
+
+            <div style="min-height: 70px;"></div>      
+
+            <footer style="font-size: x-small; margin-bottom:0px; page-break-after: always;">
+                <div>
+                    <p align="left">
+                        *ចំណាំ៖ <br />
+                        - បើមិនចង់ស្នាក់នៅបន្តត្រូវទូទាត់ប្រាក់ឪ្យគ្រប់សំរាប់ខែចាស់ <br />
+                        - បើសិនជាស្នាក់នៅបន្តលើស​ 1​ ថ្ងៃនឹងត្រូវគិតតម្លៃ 1 ខែ <br />
+                        - បើឈប់ស្នាក់នៅត្រូវឪ្យដំណឹងមុន 1អាទិត្យនៃថ្ងៃចូលស្នាក់
+                    </p>
+                </div>
+            </footer>
+        </div>
     </script>
     
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jszip/2.4.0/jszip.js"></script>
@@ -243,7 +247,7 @@
                     }
                     reader.readAsBinaryString(files[0].rawFile);
                 },
-                monthChanges    : function(){
+                monthChanges        : function(){
                     var self = this, month_of = this.get("month_of");
 
                     if(this.dataSource.length>0){
@@ -252,7 +256,7 @@
                         });
                     }
                 },
-                printData       : function(e) {
+                printData           : function(e) {
                     var tar = e.target;
                     if(tar.checked) {
                         $(".hiddenPrint").css("visibility", "hidden");
@@ -260,7 +264,7 @@
                         $(".hiddenPrint").css("visibility", "visible");
                     }
                 },
-                printFrame      : function(e) {
+                printFrame          : function(e) {
                     var tar = e.target;
                     if(tar.checked) {
                         $(".hiddenPrintFrame").css("visibility", "hidden");
