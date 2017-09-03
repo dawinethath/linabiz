@@ -149,7 +149,19 @@
                         <td align="right">
                             #=kendo.toString(eamt, 'c0', 'km-KH')#
                         </td>
-                    </tr>            
+                    </tr>
+                    #if(balance>0){#
+                    <tr>
+                        <td><span style="font-size:x-small;">ប្រាក់មិនទាន់ទូរទាត់</span></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td align="right">
+                            #=kendo.toString(balance, 'c')#
+                        </td>
+                    </tr>
+                    #}#            
                     #if(trash>0){#
                     <tr>
                         <td>ថ្លៃសំរាម</td>
@@ -173,9 +185,9 @@
                             #=kendo.toString(service, 'c')#
                         </td>
                     </tr>
-                    #}#           
-                </tbody>          
-            </table>     
+                    #}#
+                </tbody>
+            </table>
             
             <hr>
 
@@ -235,10 +247,11 @@
                                         eadd: roa[i].eadd!==undefined ? roa[i].eadd: "",
                                         eprice: roa[i].eprice,
                                         eamt: roa[i].eamt,
+                                        balance: roa[i].balance,
                                         trash: roa[i].trash,
                                         service: roa[i].service,
                                         deposit: roa[i].deposit,
-                                        rental: roa[i].rental,
+                                        rental: roa[i].rental,                                        
                                         total: roa[i].total                                        
                                     });   
                                 }
