@@ -536,7 +536,7 @@
     <tr>        
         <td>#=kendo.toString(new Date(issued_date), "dd-MM-yyyy")#</td>
         <td>
-        	#if(contact_id>0){#
+        	#if(contact.length>0){#
         		#if(contact[0].contact_type_id==3 || contact[0].contact_type_id==5){#
         			<a href="\#/contact/#=contact_id#"><i></i>#=contact[0].company#</a>
         		#}else{#        			
